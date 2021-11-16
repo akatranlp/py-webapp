@@ -13,6 +13,8 @@ setup(
         "python-multipart",
         "argon2-cffi",
         "passlib",
-        "python-dotenv"
+        "python-dotenv",
+        "pytest",
+        "requests"
     ]
 )
