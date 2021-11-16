@@ -9,5 +9,7 @@ setup(
         "fastapi",
         "uvicorn[standard]",
         "tortoise-orm",
+        "python-jose",
+        "python-multipart",
     ]
 )

@@ -1,9 +1,10 @@
 from fastapi import FastAPI
-from py_api.routers import routers_user
+from py_api.routers import routers_user, routers_auth
 from tortoise.contrib.fastapi import register_tortoise
 
 app = FastAPI()
 
+app.include_router(routers_auth.router)
 app.include_router(routers_user.router)
 
 
