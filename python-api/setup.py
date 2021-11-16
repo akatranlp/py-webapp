@@ -8,5 +8,6 @@ setup(
     install_requires=[
         "fastapi",
         "uvicorn[standard]",
+        "tortoise-orm",
     ]
 )

@@ -9,6 +9,6 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model=List[schemas_user.User])
-async def get_all() -> List[schemas_user.User]:
+@router.get('/', response_model=List[schemas_user.UserOut])
+async def get_all() -> List[schemas_user.UserOut]:
     return await repos_user.get_all()
