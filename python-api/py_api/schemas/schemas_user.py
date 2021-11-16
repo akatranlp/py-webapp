@@ -1,4 +1,5 @@
 from tortoise.contrib.pydantic import pydantic_model_creator
+from pydantic import BaseModel
 from ..models import models_user
 
 User = pydantic_model_creator(models_user.User, name='User')
@@ -21,3 +22,8 @@ UserRegister = pydantic_model_creator(models_user.User,
                                       exclude_readonly=True,
                                       exclude=('is_active',
                                                'token_version'))
+
+
+class UserToken(BaseModel):
+    access_token: str
+    token_type: str

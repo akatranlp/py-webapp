@@ -22,23 +22,23 @@ def add_refresh_cookie(response: Response, user_obj: schemas_user.User):
                         path='/refresh_token')
 
 
-async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends()) -> schemas_user.UserToken:
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid credentials')
 
     user_obj = await schemas_user.User.from_tortoise_orm(user)
     add_refresh_cookie(response, user_obj)
-    return {'access_token': jwt_token.create_access_token(user_obj), 'token_type': 'bearer'}
+    return schemas_user.UserToken(access_token=jwt_token.create_access_token(user_obj), token_type='bearer')
 
 
-async def refresh_token(request: Request, response: Response):
+async def refresh_token(request: Request, response: Response) -> schemas_user.UserToken:
     exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Refresh Token invalid')
     try:
         cookie: str = request.cookies.get('jib')
         user = await jwt_token.verify_refresh_token(cookie, exception)
 
         add_refresh_cookie(response, user)
-        return {'access_token': jwt_token.create_access_token(user), 'token_type': 'bearer'}
+        return schemas_user.UserToken(access_token=jwt_token.create_access_token(user), token_type='bearer')
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Refresh Token invalid')
