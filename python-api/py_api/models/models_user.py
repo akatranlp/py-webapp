@@ -1,5 +1,6 @@
 from tortoise import fields
 from tortoise.models import Model
+from .. import hashing
 
 
 class User(Model):
@@ -11,4 +12,4 @@ class User(Model):
     email = fields.CharField(50, unique=True)
 
     def verify_password(self, password) -> bool:
-        return password == self.password_hash
+        return hashing.verify_password(password, self.password_hash)

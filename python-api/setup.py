@@ -11,5 +11,7 @@ setup(
         "tortoise-orm",
         "python-jose",
         "python-multipart",
+        "argon2-cffi",
+        "passlib",
     ]
 )
