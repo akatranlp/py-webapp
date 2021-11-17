@@ -7,6 +7,11 @@ from .models import models_user
 oauth2_schema = OAuth2PasswordBearer(tokenUrl='login')
 
 
+def check_permission(user: schemas_user.User):
+    if not user.is_admin:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='you are not permitted to do that')
+
+
 async def get_current_user(token_data: str = Depends(oauth2_schema)) -> schemas_user.User:
     exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid credentials')
     return await jwt_token.verify_access_token(token_data, exception)

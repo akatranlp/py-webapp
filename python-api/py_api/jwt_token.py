@@ -6,7 +6,7 @@ from .config import get_config_value
 
 
 def create_access_token(user: schemas_user.User) -> str:
-    jwt_obj = {'id': user.id, 'nbf': datetime.utcnow(), 'exp': datetime.utcnow() + timedelta(minutes=15)}
+    jwt_obj = {'id': user.id, 'is_admin': user.is_admin, 'nbf': datetime.utcnow(), 'exp': datetime.utcnow() + timedelta(minutes=15)}
     return jwt.encode(jwt_obj, get_config_value('JWT_ACCESS_TOKEN_SECRET'))
 
 
