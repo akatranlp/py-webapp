@@ -42,3 +42,12 @@ async def refresh_token(request: Request, response: Response) -> schemas_user.Us
         return schemas_user.UserToken(access_token=jwt_token.create_access_token(user), token_type='bearer')
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Refresh Token invalid')
+
+
+async def change_password(response: Response, passwords: schemas_user.UserChangePassword,
+                          user: schemas_user.User) -> schemas_user.UserToken:
+    user_obj = await models_user.User.get(username=user.username)
+    if not await user_obj.set_new_password(passwords.old_password, passwords.new_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='False old password')
+    add_refresh_cookie(response, user)
+    return schemas_user.UserToken(access_token=jwt_token.create_access_token(user), token_type='bearer')

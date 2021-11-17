@@ -27,6 +27,11 @@ UserRegister = pydantic_model_creator(models_user.User,
                                                'token_version'))
 
 
+class UserChangePassword(BaseModel):
+    old_password: str
+    new_password: str
+
+
 class UserToken(BaseModel):
     access_token: str
     token_type: str
