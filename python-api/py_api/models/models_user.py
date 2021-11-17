@@ -14,3 +14,10 @@ class User(Model):
 
     def verify_password(self, password) -> bool:
         return hashing.verify_password(password, self.password_hash)
+
+    async def set_new_password(self, old_password, new_password) -> bool:
+        if not self.verify_password(old_password):
+            return False
+        self.password_hash = hashing.hash_password(new_password)
+        await self.save()
+        return True
