@@ -12,6 +12,23 @@ async def get_all() -> List[schemas_user.UserOut]:
     return user_list
 
 
+async def get_user(user_name: str):
+    user = await models_user.User.get(username=user_name)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User does not exist')
+    return await schemas_user.UserOut.from_tortoise_orm(user)
+
+
+async def delete_user(user_name: str):
+    user = await models_user.User.get(username=user_name)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User does not exist')
+    user.is_active = False
+    user.token_version += 1
+    await user.save()
+    return await schemas_user.UserOut.from_tortoise_orm(user)
+
+
 async def create(user: schemas_user.UserRegister) -> schemas_user.User:
     user_obj = models_user.User(username=user.username,
                                 password_hash=hashing.hash_password(user.password_hash),
