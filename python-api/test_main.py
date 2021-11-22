@@ -217,3 +217,20 @@ def test_refresh_token(client: TestClient, test_user: dict):
     assert token != data['access_token']
     assert response.cookies['jib'] != cookie
     client.cookies.clear_session_cookies()
+
+
+def test_get_user(client: TestClient, test_user: dict, admin_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/users/adminTest', headers=headers)
+
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'you are not permitted to do that'}
+    client.cookies.clear_session_cookies()
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+
+    response = client.get('/users/adminTest', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == {'email': 'admin@test.com', 'username': 'adminTest'}
