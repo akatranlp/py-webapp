@@ -101,3 +101,36 @@ def test_create_admin(client: TestClient, event_loop: asyncio.AbstractEventLoop,
     user_obj: models_user.User = event_loop.run_until_complete(change_to_admin_and_return())
     assert user_obj.id == admin_user['id']
     assert user_obj.is_admin
+
+
+def test_already_taken(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
+    response = client.post('/users', json={'username': test_user['username'], 'email': 'hello@test.com',
+                                           'password_hash': test_user['password']})
+    assert response.status_code == 400
+    assert response.json() == {'detail': 'Username or Email already taken'}
+
+    response = client.post('/users', json={'username': 'Hello', 'email': test_user['email'],
+                                           'password_hash': test_user['password']})
+    assert response.status_code == 400
+    assert response.json() == {'detail': 'Username or Email already taken'}
+
+
+def test_not_all_delivered(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
+    response = client.post('/users', json={})
+    assert response.status_code == 422
+    assert response.json() == {'detail': [{'loc': ['body', 'username'],
+                                           'msg': 'field required',
+                                           'type': 'value_error.missing'},
+                                          {'loc': ['body', 'password_hash'],
+                                           'msg': 'field required',
+                                           'type': 'value_error.missing'},
+                                          {'loc': ['body', 'email'],
+                                           'msg': 'field required',
+                                           'type': 'value_error.missing'}]}
+
+
+def test_read_users_again(client: TestClient):
+    response = client.get('/users')
+    assert response.status_code == 200
+    assert response.json() == [{'email': 'test@test.com', 'username': 'Test'},
+                               {'email': 'admin@test.com', 'username': 'adminTest'}]
