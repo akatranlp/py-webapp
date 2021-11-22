@@ -134,3 +134,36 @@ def test_read_users_again(client: TestClient):
     assert response.status_code == 200
     assert response.json() == [{'email': 'test@test.com', 'username': 'Test'},
                                {'email': 'admin@test.com', 'username': 'adminTest'}]
+
+
+def test_unauthorized(client: TestClient):
+    response = client.get('/users/me')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+
+def test_does_not_exist(client: TestClient):
+    response = client.post('/login', data={'username': 'Hello', 'password': 'hello'})
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+
+def login(client: TestClient, user: dict) -> str:
+    form = {
+        'username': user['username'],
+        'password': user['password']
+    }
+
+    response = client.post('/login', data=form)
+    assert response.status_code == 200
+    data = response.json()
+    assert data['token_type'] == 'bearer', data['access_token']
+    assert len(response.cookies) == 1
+    assert len(client.cookies) == 1
+    return data['access_token']
+
+
+def test_login(client: TestClient, test_user: dict):
+    login(client, test_user)
+    client.cookies.clear_session_cookies()
+    assert len(client.cookies) == 0
