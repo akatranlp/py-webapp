@@ -281,3 +281,49 @@ def test_deactivate_login(client: TestClient, event_loop: asyncio.AbstractEventL
     assert user_obj.is_active
 
     assert login(client, test_user)
+
+
+def test_change_password(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
+    response = client.post('/change_password')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    cookie = client.cookies['jib']
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.post('/change_password', headers=headers, json={})
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': [{'loc': ['body', 'old_password'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'new_password'], 'msg': 'field required', 'type': 'value_error.missing'}]}
+
+    new_password = get_random_string(32)
+    response = client.post('/change_password', headers=headers,
+                           json={'old_password': 'Fake Password', 'new_password': new_password})
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'False old password'}
+
+    time.sleep(1)
+    response = client.post('/change_password', headers=headers,
+                           json={'old_password': test_user['password'], 'new_password': new_password})
+    assert response.status_code == 200
+    data = response.json()
+    assert data['token_type'] == 'bearer', data['access_token']
+    assert len(response.cookies) == 1
+    assert len(client.cookies) == 1
+    assert token != data['access_token']
+    assert cookie != client.cookies['jib']
+
+    async def get_user_by_db():
+        user = await models_user.User.get(id=test_user['id'])
+        return user
+
+    user_obj: models_user.User = event_loop.run_until_complete(get_user_by_db())
+    assert user_obj.password_hash != test_user['password_hash']
+    assert not user_obj.verify_password(test_user['password'])
+    assert user_obj.verify_password(new_password)
+
+    test_user['password'] = new_password
+    test_user['password_hash'] = user_obj.password_hash
+
+    assert login(client, test_user)
