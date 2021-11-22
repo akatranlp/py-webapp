@@ -8,6 +8,8 @@ from py_api.config import set_config_value
 set_config_value('DATABASE_URL', 'sqlite://:memory:')
 
 from main import app
+from py_api.models import models_user
+
 
 @pytest.fixture(scope="module")
 def client() -> Generator:
@@ -31,3 +33,18 @@ def test_read_users(client: TestClient):
     assert response.status_code == 200
     assert response.json() == []
 
+
+def test_create_user(client: TestClient, event_loop: asyncio.AbstractEventLoop):
+    response = client.post("/users", json={"username": "Test", "email": "test@test.com", "password_hash": "test"})
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["username"] == "Test", data["email"] == "test@test.com"
+    assert "id" in data
+    user_id = data["id"]
+
+    async def get_user_by_db():
+        user = await models_user.User.get(id=user_id)
+        return user
+
+    user_obj = event_loop.run_until_complete(get_user_by_db())
+    assert user_obj.id == user_id
