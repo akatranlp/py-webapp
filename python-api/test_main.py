@@ -22,6 +22,28 @@ from py_api.models import models_user
 
 
 @pytest.fixture(scope='module')
+def test_user() -> Generator:
+    yield {
+        'id': None,
+        'username': 'Test',
+        'password': get_random_string(32),
+        'password_hash': None,
+        'email': 'test@test.com'
+    }
+
+
+@pytest.fixture(scope='module')
+def admin_user() -> Generator:
+    yield {
+        'id': None,
+        'username': 'adminTest',
+        'password': get_random_string(32),
+        'password_hash': None,
+        'email': 'admin@test.com'
+    }
+
+
+@pytest.fixture(scope='module')
 def client() -> Generator:
     with TestClient(app) as c:
         yield c
@@ -44,17 +66,38 @@ def test_read_users(client: TestClient):
     assert response.json() == []
 
 
-def test_create_user(client: TestClient, event_loop: asyncio.AbstractEventLoop):
-    response = client.post('/users', json={'username': 'Test', 'email': 'test@test.com', 'password_hash': 'test'})
+def create_user(client: TestClient, user: dict):
+    response = client.post('/users', json={'username': user['username'], 'email': user['email'],
+                                           'password_hash': user['password']})
     assert response.status_code == 200, response.text
     data = response.json()
-    assert data['username'] == 'Test', data['email'] == 'test@test.com'
+    assert data['username'] == user['username'], data['email'] == user['email']
     assert 'id' in data
-    user_id = data['id']
+    user['id'] = data['id']
+    assert 'password_hash' in data
+    user['password_hash'] = data['password_hash']
+
+
+def test_create_user(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
+    create_user(client, test_user)
 
     async def get_user_by_db():
-        user = await models_user.User.get(id=user_id)
+        user = await models_user.User.get(id=test_user['id'])
         return user
 
     user_obj = event_loop.run_until_complete(get_user_by_db())
-    assert user_obj.id == user_id
+    assert user_obj.id == test_user['id']
+
+
+def test_create_admin(client: TestClient, event_loop: asyncio.AbstractEventLoop, admin_user: dict):
+    create_user(client, admin_user)
+
+    async def change_to_admin_and_return():
+        user = await models_user.User.get(id=admin_user['id'])
+        user.is_admin = True
+        await user.save()
+        return user
+
+    user_obj: models_user.User = event_loop.run_until_complete(change_to_admin_and_return())
+    assert user_obj.id == admin_user['id']
+    assert user_obj.is_admin
