@@ -33,9 +33,8 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
     return schemas_user.UserToken(access_token=jwt_token.create_access_token(user_obj), token_type='bearer')
 
 
-async def logout(response: Response) -> str:
+def logout(response: Response):
     response.delete_cookie(key='jib', path='/refresh_token')
-    return "logout"
 
 
 async def refresh_token(request: Request, response: Response) -> schemas_user.UserToken:

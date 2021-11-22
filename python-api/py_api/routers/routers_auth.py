@@ -14,9 +14,9 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
     return await repos_auth.login(response, form_data)
 
 
-@router.post('/logout', response_model=schemas_user.UserToken)
-async def logout(response: Response) -> str:
-    return await repos_auth.logout(response)
+@router.get('/logout')
+async def logout(response: Response):
+    repos_auth.logout(response)
 
 
 @router.get("/refresh_token", response_model=schemas_user.UserToken)
