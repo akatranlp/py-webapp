@@ -9,8 +9,12 @@ config = {
 
 
 def get_config_value(name: str, default: str = None):
-    res = config.get(name)
-    return res if res or not default else default
+    return config.get(name, default)
+
+
+# set config value at runtime (only used for tests)
+def set_config_value(name: str, value: str):
+    config[name] = value
 
 
 def validate_needed_keys(keys: List[str]):

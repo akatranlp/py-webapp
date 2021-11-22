@@ -15,6 +15,7 @@ setup(
         "passlib",
         "python-dotenv",
         "pytest",
-        "requests"
+        "requests",
+        "asynctest"
     ]
 )

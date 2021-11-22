@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from py_api.routers import routers_user, routers_auth
 from tortoise.contrib.fastapi import register_tortoise
-from py_api.config import validate_needed_keys
+from py_api.config import validate_needed_keys, get_config_value
 
 needed_keys = ['JWT_REFRESH_TOKEN_SECRET', 'JWT_ACCESS_TOKEN_SECRET']
 if not validate_needed_keys(needed_keys):
@@ -23,7 +23,7 @@ def hello():
 
 register_tortoise(
     app,
-    db_url='sqlite://db.sqlite3',
+    db_url=get_config_value('DATABASE_URL', 'sqlite://db.sqlite3'),
     modules={'models': ['py_api.models.models_user']},
     generate_schemas=True,
     add_exception_handlers=True,
