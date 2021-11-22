@@ -234,3 +234,32 @@ def test_get_user(client: TestClient, test_user: dict, admin_user: dict):
     response = client.get('/users/adminTest', headers=headers)
     assert response.status_code == 200
     assert response.json() == {'email': 'admin@test.com', 'username': 'adminTest'}
+
+
+def test_deactivate_user(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict, admin_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.delete('/users/Test', headers=headers)
+
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'you are not permitted to do that'}
+    client.cookies.clear_session_cookies()
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+
+    response = client.delete('/users/Test', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == {'email': 'test@test.com', 'username': 'Test'}
+
+    response = client.get('/users')
+    assert response.status_code == 200
+    assert response.json() == [{'email': 'admin@test.com', 'username': 'adminTest'}]
+
+    async def get_user_by_db():
+        user = await models_user.User.get(id=test_user['id'])
+        return user
+
+    user_obj: models_user.User = event_loop.run_until_complete(get_user_by_db())
+    assert user_obj.id == test_user['id']
+    assert not user_obj.is_active
