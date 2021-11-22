@@ -19,7 +19,7 @@ async def logout(response: Response) -> str:
     return await repos_auth.logout(response)
 
 
-@router.post("/refresh_token", response_model=schemas_user.UserToken)
+@router.get("/refresh_token", response_model=schemas_user.UserToken)
 async def refresh_token(request: Request, response: Response) -> schemas_user.UserToken:
     return await repos_auth.refresh_token(request, response)
 
