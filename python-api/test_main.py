@@ -1,4 +1,5 @@
 import asyncio
+import time
 from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
@@ -40,6 +41,15 @@ def admin_user() -> Generator:
         'password': get_random_string(32),
         'password_hash': None,
         'email': 'admin@test.com'
+    }
+
+
+@pytest.fixture(scope='module')
+def session() -> Generator:
+    yield {
+        'cookie': None,
+        'bearer': None,
+        'user': None
     }
 
 
@@ -176,4 +186,34 @@ def test_me(client: TestClient, test_user: dict):
     response = client.get('/users/me', headers=headers)
     assert response.status_code == 200
     assert response.json() == {'username': test_user['username'], 'email': test_user['email']}
+    client.cookies.clear_session_cookies()
+
+
+def test_invalid_refresh(client: TestClient, test_user: dict):
+    response = client.get('/refresh_token')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Refresh Token invalid'}
+
+    response = client.get('/refresh_token', cookies={'jib': 'FalscherToken'})
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Refresh Token invalid'}
+
+
+def test_refresh_token(client: TestClient, test_user: dict):
+    token = login(client, test_user)
+    assert len(client.cookies) == 1
+    assert client.cookies['jib']
+    # weil die cookies secure sind können sie nur über https übertragen werden, wegen cors
+    # deshalb tricksen wir ein bisschen beim testen und setzen den cookie selber
+    cookie = client.cookies['jib']
+
+    time.sleep(1)
+    response = client.get('/refresh_token', cookies={'jib': cookie})
+    assert response.status_code == 200
+    data = response.json()
+    assert data['token_type'] == 'bearer', data['access_token']
+    assert len(response.cookies) == 1
+    assert len(client.cookies) == 1
+    assert token != data['access_token']
+    assert response.cookies['jib'] != cookie
     client.cookies.clear_session_cookies()
