@@ -128,15 +128,10 @@ def test_already_taken(client: TestClient, event_loop: asyncio.AbstractEventLoop
 def test_not_all_delivered(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
     response = client.post('/users', json={})
     assert response.status_code == 422
-    assert response.json() == {'detail': [{'loc': ['body', 'username'],
-                                           'msg': 'field required',
-                                           'type': 'value_error.missing'},
-                                          {'loc': ['body', 'password_hash'],
-                                           'msg': 'field required',
-                                           'type': 'value_error.missing'},
-                                          {'loc': ['body', 'email'],
-                                           'msg': 'field required',
-                                           'type': 'value_error.missing'}]}
+    assert response.json() == {
+        'detail': [{'loc': ['body', 'username'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'password_hash'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'email'], 'msg': 'field required', 'type': 'value_error.missing'}]}
 
 
 def test_read_users_again(client: TestClient):
@@ -174,7 +169,7 @@ def login(client: TestClient, user: dict) -> str:
 
 
 def test_login(client: TestClient, test_user: dict):
-    login(client, test_user)
+    assert login(client, test_user)
     client.cookies.clear_session_cookies()
     assert len(client.cookies) == 0
 
@@ -263,3 +258,26 @@ def test_deactivate_user(client: TestClient, event_loop: asyncio.AbstractEventLo
     user_obj: models_user.User = event_loop.run_until_complete(get_user_by_db())
     assert user_obj.id == test_user['id']
     assert not user_obj.is_active
+
+
+def test_deactivate_login(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
+    form = {
+        'username': test_user['username'],
+        'password': test_user['password']
+    }
+
+    response = client.post('/login', data=form)
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'your account is not active'}
+
+    async def set_user_active_again():
+        user = await models_user.User.get(id=test_user['id'])
+        user.is_active = True
+        await user.save()
+        return user
+
+    user_obj: models_user.User = event_loop.run_until_complete(set_user_active_again())
+    assert user_obj.id == test_user['id']
+    assert user_obj.is_active
+
+    assert login(client, test_user)

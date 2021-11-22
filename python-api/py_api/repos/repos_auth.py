@@ -26,7 +26,8 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid credentials')
-
+    if not user.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='your account is not active')
     user_obj = await schemas_user.User.from_tortoise_orm(user)
     add_refresh_cookie(response, user_obj)
     return schemas_user.UserToken(access_token=jwt_token.create_access_token(user_obj), token_type='bearer')
