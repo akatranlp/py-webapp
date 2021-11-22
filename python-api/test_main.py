@@ -167,3 +167,13 @@ def test_login(client: TestClient, test_user: dict):
     login(client, test_user)
     client.cookies.clear_session_cookies()
     assert len(client.cookies) == 0
+
+
+def test_me(client: TestClient, test_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+
+    response = client.get('/users/me', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == {'username': test_user['username'], 'email': test_user['email']}
+    client.cookies.clear_session_cookies()
