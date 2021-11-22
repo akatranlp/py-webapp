@@ -17,36 +17,36 @@ from main import app
 from py_api.models import models_user
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='module')
 def client() -> Generator:
     with TestClient(app) as c:
         yield c
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='module')
 def event_loop(client: TestClient) -> Generator:
     yield asyncio.get_event_loop()
 
 
 def test_read_main(client: TestClient):
-    response = client.get("/")
+    response = client.get('/')
     assert response.status_code == 200
     assert response.json() == {'success': True, 'message': 'Hello World'}
 
 
 def test_read_users(client: TestClient):
-    response = client.get("/users")
+    response = client.get('/users')
     assert response.status_code == 200
     assert response.json() == []
 
 
 def test_create_user(client: TestClient, event_loop: asyncio.AbstractEventLoop):
-    response = client.post("/users", json={"username": "Test", "email": "test@test.com", "password_hash": "test"})
+    response = client.post('/users', json={'username': 'Test', 'email': 'test@test.com', 'password_hash': 'test'})
     assert response.status_code == 200, response.text
     data = response.json()
-    assert data["username"] == "Test", data["email"] == "test@test.com"
-    assert "id" in data
-    user_id = data["id"]
+    assert data['username'] == 'Test', data['email'] == 'test@test.com'
+    assert 'id' in data
+    user_id = data['id']
 
     async def get_user_by_db():
         user = await models_user.User.get(id=user_id)
