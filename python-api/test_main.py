@@ -331,3 +331,18 @@ def test_change_password(client: TestClient, event_loop: asyncio.AbstractEventLo
 
     assert login(client, test_user)
     client.cookies.clear_session_cookies()
+
+
+def test_logout(client: TestClient, test_user: dict):
+    assert login(client, test_user)
+
+    assert len(client.cookies) == 1
+    assert client.cookies['jib']
+
+    response = client.get('/logout')
+    assert response.status_code == 200
+
+    assert len(client.cookies) == 0
+    assert not client.cookies.get('jib')
+
+    client.cookies.clear_session_cookies()
