@@ -229,6 +229,7 @@ def test_get_user(client: TestClient, test_user: dict, admin_user: dict):
     response = client.get('/users/adminTest', headers=headers)
     assert response.status_code == 200
     assert response.json() == {'email': 'admin@test.com', 'username': 'adminTest'}
+    client.cookies.clear_session_cookies()
 
 
 def test_deactivate_user(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict, admin_user: dict):
@@ -258,6 +259,7 @@ def test_deactivate_user(client: TestClient, event_loop: asyncio.AbstractEventLo
     user_obj: models_user.User = event_loop.run_until_complete(get_user_by_db())
     assert user_obj.id == test_user['id']
     assert not user_obj.is_active
+    client.cookies.clear_session_cookies()
 
 
 def test_deactivate_login(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
@@ -281,6 +283,7 @@ def test_deactivate_login(client: TestClient, event_loop: asyncio.AbstractEventL
     assert user_obj.is_active
 
     assert login(client, test_user)
+    client.cookies.clear_session_cookies()
 
 
 def test_change_password(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
@@ -327,3 +330,19 @@ def test_change_password(client: TestClient, event_loop: asyncio.AbstractEventLo
     test_user['password_hash'] = user_obj.password_hash
 
     assert login(client, test_user)
+    client.cookies.clear_session_cookies()
+
+
+def test_logout(client: TestClient, test_user: dict):
+    assert login(client, test_user)
+
+    assert len(client.cookies) == 1
+    assert client.cookies['jib']
+
+    response = client.get('/logout')
+    assert response.status_code == 200
+
+    assert len(client.cookies) == 0
+    assert not client.cookies.get('jib')
+
+    client.cookies.clear_session_cookies()
