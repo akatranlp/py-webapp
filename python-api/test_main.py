@@ -344,10 +344,12 @@ def test_logout(client: TestClient, test_user: dict):
     client.cookies.clear_session_cookies()
 
 
-def test_index_html(client: TestClient):
+def test_index_template(client: TestClient):
     response = client.get('/')
     assert response.status_code == 200
     assert response.headers['content-type'] == 'text/html; charset=utf-8'
+    assert response.template.name == 'index.html'
+    assert "request" in response.context
 
     response = client.get('/static/js/index.js')
     assert response.status_code == 200
