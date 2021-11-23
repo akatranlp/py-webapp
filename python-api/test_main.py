@@ -337,3 +337,17 @@ def test_logout(client: TestClient, test_user: dict):
     assert not client.cookies.get('jib')
 
     client.cookies.clear_session_cookies()
+
+
+def test_index_html(client: TestClient):
+    response = client.get('/')
+    assert response.status_code == 200
+    assert response.headers['content-type'] == 'text/html; charset=utf-8'
+
+    response = client.get('/static/js/index.js')
+    assert response.status_code == 200
+    assert response.headers['content-type'] == 'application/javascript'
+
+    response = client.get('/static/css/index.css')
+    assert response.status_code == 200
+    assert response.headers['content-type'] == 'text/css; charset=utf-8'
