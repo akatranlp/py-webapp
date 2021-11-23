@@ -13,7 +13,7 @@ app.include_router(routers_auth.router)
 app.include_router(routers_user.router)
 
 
-@app.get("/")
+@app.get("/hello_world")
 def hello():
     return {
         'success': True,

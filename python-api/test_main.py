@@ -65,7 +65,7 @@ def event_loop(client: TestClient) -> Generator:
 
 
 def test_read_main(client: TestClient):
-    response = client.get('/')
+    response = client.get('/hello-world')
     assert response.status_code == 200
     assert response.json() == {'success': True, 'message': 'Hello World'}
 
