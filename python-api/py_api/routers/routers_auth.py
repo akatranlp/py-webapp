@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Response, Request, Depends
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from ..repos import repos_auth
 from ..schemas import schemas_user
@@ -15,8 +16,10 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
 
 
 @router.get('/logout')
-async def logout(response: Response):
+async def logout() -> RedirectResponse:
+    response = RedirectResponse(url='/')
     repos_auth.logout(response)
+    return response
 
 
 @router.get("/refresh_token", response_model=schemas_user.UserToken)
