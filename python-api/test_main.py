@@ -330,8 +330,13 @@ def test_logout(client: TestClient, test_user: dict):
     assert len(client.cookies) == 1
     assert client.cookies['jib']
 
-    response = client.get('/logout')
+    response = client.get('/logout', allow_redirects=False)
+    assert response.status_code == 307
+    assert response.headers['location'] == '/'
+
+    response = client.send(response.next)
     assert response.status_code == 200
+    assert response.url == f'{client.base_url}/'
 
     assert len(client.cookies) == 0
     assert not client.cookies.get('jib')
