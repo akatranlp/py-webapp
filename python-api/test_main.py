@@ -45,15 +45,6 @@ def admin_user() -> Generator:
 
 
 @pytest.fixture(scope='module')
-def session() -> Generator:
-    yield {
-        'cookie': None,
-        'bearer': None,
-        'user': None
-    }
-
-
-@pytest.fixture(scope='module')
 def client() -> Generator:
     with TestClient(app) as c:
         yield c
@@ -65,7 +56,7 @@ def event_loop(client: TestClient) -> Generator:
 
 
 def test_read_main(client: TestClient):
-    response = client.get('/')
+    response = client.get('/hello-world')
     assert response.status_code == 200
     assert response.json() == {'success': True, 'message': 'Hello World'}
 
@@ -346,3 +337,17 @@ def test_logout(client: TestClient, test_user: dict):
     assert not client.cookies.get('jib')
 
     client.cookies.clear_session_cookies()
+
+
+def test_index_html(client: TestClient):
+    response = client.get('/')
+    assert response.status_code == 200
+    assert response.headers['content-type'] == 'text/html; charset=utf-8'
+
+    response = client.get('/static/js/index.js')
+    assert response.status_code == 200
+    assert response.headers['content-type'] == 'application/javascript'
+
+    response = client.get('/static/css/index.css')
+    assert response.status_code == 200
+    assert response.headers['content-type'] == 'text/css; charset=utf-8'

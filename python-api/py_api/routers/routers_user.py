@@ -3,7 +3,7 @@ from fastapi import Depends
 from ..schemas import schemas_user
 from ..repos import repos_user
 from .. import oauth2
-from .router_helper import APIRouter
+from .routers_helper import APIRouter
 
 router = APIRouter(
     tags=['Users'],

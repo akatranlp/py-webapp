@@ -16,6 +16,7 @@ setup(
         "python-dotenv",
         "pytest",
         "requests",
-        "asynctest"
+        "asynctest",
+        "jinja2"
     ]
 )

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from py_api.routers import routers_user, routers_auth
+from fastapi.staticfiles import StaticFiles
+from py_api.routers import routers_user, routers_auth, routers_client
 from tortoise.contrib.fastapi import register_tortoise
 from py_api.config import validate_needed_keys, get_config_value
 
@@ -9,11 +10,14 @@ if not validate_needed_keys(needed_keys):
 
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 app.include_router(routers_auth.router)
 app.include_router(routers_user.router)
+app.include_router(routers_client.router)
 
 
-@app.get("/")
+@app.get("/hello-world")
 def hello():
     return {
         'success': True,
