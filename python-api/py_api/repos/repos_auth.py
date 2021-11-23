@@ -17,7 +17,6 @@ async def authenticate_user(username: str, password: str):
 def add_refresh_cookie(response: Response, user_obj: schemas_user.User):
     response.set_cookie(key='jib',
                         value=jwt_token.create_refresh_token(user_obj),
-                        secure=True,
                         httponly=True,
                         path='/refresh_token')
 
