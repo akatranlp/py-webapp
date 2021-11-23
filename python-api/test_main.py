@@ -45,15 +45,6 @@ def admin_user() -> Generator:
 
 
 @pytest.fixture(scope='module')
-def session() -> Generator:
-    yield {
-        'cookie': None,
-        'bearer': None,
-        'user': None
-    }
-
-
-@pytest.fixture(scope='module')
 def client() -> Generator:
     with TestClient(app) as c:
         yield c
