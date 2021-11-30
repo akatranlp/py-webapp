@@ -1,21 +1,9 @@
 import warnings
+from pydantic import BaseModel
 from typing import List
 from fastapi import APIRouter
 import os
 import importlib
-
-'''
-Plugin Struktur:
-    es muss sich um ein package handeln welches direkt unter ./plugins platziert wird.
-    in der __init__.py muss die Plugin Klasse importiert werden z.B.:
-        from .example_plugin import Plugin
-    die Plugin Klasse muss von PluginInterface erben
-    
-    static und templates werden in eigenen Ordnern untergebracht, aber im root verzeichnis des Plugins
-    ./example_plugin/static
-    ./example_plugin/templates
-    diese werden dann automatisch in den Ordnern ./plugins/example_plugin/ gespeichert
-'''
 
 
 class PluginInterface:
@@ -72,3 +60,8 @@ class PluginLoader:
                 continue
 
             self.plugins.append(plugin)
+
+
+class PluginSchema(BaseModel):
+    name: str
+    routes: List[str]
