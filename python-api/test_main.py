@@ -4,19 +4,19 @@ from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
 
-from py_api.config import set_config_value
+from py_api.config import Config
 from main_generate_random_string import get_random_string
 
 # import os
 # os.remove('test_db.sqllite3')
 
-# set_config_value('DATABASE_URL', 'sqlite://test_db.sqllite3')
-set_config_value('DATABASE_URL', 'sqlite://:memory:')
+# Config.get_instance().set_config_value('DATABASE_URL', 'sqlite://test_db.sqlite3')
+Config.get_instance().set_config_value('DATABASE_URL', 'sqlite://:memory:')
 
 jwt_access_secret = get_random_string(128)
 jwt_refresh_secret = get_random_string(128)
-set_config_value('JWT_ACCESS_TOKEN_SECRET', jwt_access_secret)
-set_config_value('JWT_REFRESH_TOKEN_SECRET', jwt_refresh_secret)
+Config.get_instance().set_config_value('JWT_ACCESS_TOKEN_SECRET', jwt_access_secret)
+Config.get_instance().set_config_value('JWT_REFRESH_TOKEN_SECRET', jwt_refresh_secret)
 
 from main import app
 from py_api.models import models_user
