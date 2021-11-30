@@ -1,6 +1,6 @@
 # own gitignore
 .idea
-*.sqllite3*
+*.sqlite3*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

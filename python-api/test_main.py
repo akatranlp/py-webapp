@@ -10,7 +10,7 @@ from main_generate_random_string import get_random_string
 # import os
 # os.remove('test_db.sqllite3')
 
-# Config.get_instance().set_config_value('DATABASE_URL', 'sqlite://test_db.sqllite3')
+# Config.get_instance().set_config_value('DATABASE_URL', 'sqlite://test_db.sqlite3')
 Config.get_instance().set_config_value('DATABASE_URL', 'sqlite://:memory:')
 
 jwt_access_secret = get_random_string(128)
