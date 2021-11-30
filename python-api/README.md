@@ -14,4 +14,6 @@ FastAPI erstellt automatisch eine interaktive doku mit Swagger oder alternativ m
 hierfür sind die links /docs und /redoc
 
 Um die Tests durchzuführen benutzen wir "pytest" hierzu für wir nur den Befehl "pytest" aus 
-und alle Tests aus files mit dem Namen \*\_test.py oder test_*.py werden ausgeführt 
+und alle Tests aus files mit dem Namen \*\_test.py oder test_*.py werden ausgeführt
+
+Eine Beschreibung wie ein Plugin entwickelt wird befindet sich in der [Plugins Readme](py-api/plugins/README.md)
