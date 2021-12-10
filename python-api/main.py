@@ -7,7 +7,7 @@ from py_api.routers import routers_user, routers_auth, routers_client
 from tortoise.contrib.fastapi import register_tortoise
 from py_api.config import Config
 
-Config.get_instance().register_needed_keys(keys=['JWT_REFRESH_TOKEN_SECRET', 'JWT_ACCESS_TOKEN_SECRET'])
+Config.get_instance().register_needed_keys(keys=['JWT_REFRESH_TOKEN_SECRET', 'JWT_ACCESS_TOKEN_SECRET', 'SYSTEM_ID'])
 
 models = ['py_api.models.models_user']
 
