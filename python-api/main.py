@@ -9,7 +9,8 @@ from py_api.config import Config
 
 Config.get_instance().register_needed_keys(keys=['JWT_REFRESH_TOKEN_SECRET', 'JWT_ACCESS_TOKEN_SECRET', 'SYSTEM_ID'])
 
-models = ['py_api.models.models_user', 'py_api.models.models_todo', 'py_api.models.models_event', 'py_api.models.models_contacts']
+models = ['py_api.models.models_user', 'py_api.models.models_todo', 'py_api.models.models_event',
+          'py_api.models.models_contact']
 
 plugin_loader = PluginLoader()
 
