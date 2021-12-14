@@ -207,12 +207,10 @@ def test_refresh_token(client: TestClient, test_user: dict):
     token = login(client, test_user)
     assert len(client.cookies) == 1
     assert client.cookies['jib']
-    # weil die cookies secure sind können sie nur über https übertragen werden, wegen cors
-    # deshalb tricksen wir ein bisschen beim testen und setzen den cookie selber
     cookie = client.cookies['jib']
 
     time.sleep(1)
-    response = client.get('/refresh_token', cookies={'jib': cookie})
+    response = client.get('/refresh_token')
     assert response.status_code == 200
     data = response.json()
     assert data['token_type'] == 'bearer', data['access_token']
