@@ -16,14 +16,14 @@ def create_refresh_token(user: schemas_user.User) -> str:
     return jwt.encode(jwt_obj, Config.get_instance().get_config_value('JWT_REFRESH_TOKEN_SECRET'))
 
 
-async def verify_access_token(token: str, exception: Exception) -> schemas_user.User:
+async def verify_access_token(token: str, exception: Exception) -> models_user.User:
     try:
         payload = jwt.decode(token, Config.get_instance().get_config_value('JWT_ACCESS_TOKEN_SECRET'), algorithms=['HS256'])
         user = await models_user.User.get(id=payload.get('id'))
     except:
         raise exception
 
-    return await schemas_user.User.from_tortoise_orm(user)
+    return user
 
 
 async def verify_refresh_token(token: str, exception: Exception) -> schemas_user.User:
