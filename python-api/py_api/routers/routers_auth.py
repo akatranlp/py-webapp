@@ -27,7 +27,7 @@ async def refresh_token(request: Request, response: Response) -> schemas_user.Us
     return await repos_auth.refresh_token(request, response)
 
 
-@router.post("/change_password", response_model=schemas_user.UserToken)
+@router.put("/change_password", response_model=schemas_user.UserToken)
 async def change_password(response: Response, passwords: schemas_user.UserChangePassword,
                           user: schemas_user.User = Depends(oauth2.get_current_active_user)) -> schemas_user.UserToken:
     return await repos_auth.change_password(response, passwords, user)

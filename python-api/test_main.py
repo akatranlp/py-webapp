@@ -296,28 +296,28 @@ def test_deactivate_login(client: TestClient, event_loop: asyncio.AbstractEventL
 
 
 def test_change_password(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
-    response = client.post('/change_password')
+    response = client.put('/change_password')
     assert response.status_code == 401
     assert response.json() == {'detail': 'Not authenticated'}
 
     token = login(client, test_user)
     cookie = client.cookies['jib']
     headers = {'Authorization': f'Bearer {token}'}
-    response = client.post('/change_password', headers=headers, json={})
+    response = client.put('/change_password', headers=headers, json={})
     assert response.status_code == 422
     assert response.json() == {
         'detail': [{'loc': ['body', 'old_password'], 'msg': 'field required', 'type': 'value_error.missing'},
                    {'loc': ['body', 'new_password'], 'msg': 'field required', 'type': 'value_error.missing'}]}
 
     new_password = get_random_string(32)
-    response = client.post('/change_password', headers=headers,
-                           json={'old_password': 'Fake Password', 'new_password': new_password})
+    response = client.put('/change_password', headers=headers,
+                          json={'old_password': 'Fake Password', 'new_password': new_password})
     assert response.status_code == 401
     assert response.json() == {'detail': 'False old password'}
 
     time.sleep(1)
-    response = client.post('/change_password', headers=headers,
-                           json={'old_password': test_user['password'], 'new_password': new_password})
+    response = client.put('/change_password', headers=headers,
+                          json={'old_password': test_user['password'], 'new_password': new_password})
     assert response.status_code == 200
     data = response.json()
     assert data['token_type'] == 'bearer', data['access_token']
