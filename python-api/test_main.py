@@ -1,6 +1,7 @@
 import asyncio
 import time
 from typing import Generator
+from uuid import UUID, uuid1
 import pytest
 from fastapi.testclient import TestClient
 
@@ -23,7 +24,7 @@ Config.get_instance().set_config_value('JWT_ACCESS_TOKEN_SECRET', jwt_access_sec
 Config.get_instance().set_config_value('JWT_REFRESH_TOKEN_SECRET', jwt_refresh_secret)
 
 from main import app
-from py_api.models import models_user
+from py_api.models import models_user, models_event
 
 
 @pytest.fixture(scope='module')
@@ -46,6 +47,19 @@ def admin_user() -> Generator:
         'password_hash': None,
         'email': 'admin@test.com'
     }
+
+
+@pytest.fixture(scope='module')
+def test_event() -> Generator:
+    yield {'uuid': None,
+           'system_id': None,
+           'created_at': None,
+           'updated_at': None,
+           'title': 'Test-Termin',
+           'start_date': '2021-12-14T14:00:37.000001+00:00',
+           'end_date': '2021-12-15T14:00:37.000001+00:00',
+           'description': 'Dies ist ein Test Termin!!',
+           'location': 'Hochschule Flensburg'}
 
 
 @pytest.fixture(scope='module')
@@ -362,3 +376,164 @@ def test_index_template(client: TestClient):
     response = client.get('/static/css/index.css')
     assert response.status_code == 200
     assert response.headers['content-type'] == 'text/css; charset=utf-8'
+
+
+def test_get_events(client: TestClient):
+    response = client.get('/events')
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def validate_event_json(json_data, event):
+    return json_data == {'uuid': event['uuid'],
+                         'system_id': event['system_id'],
+                         'created_at': event['created_at'],
+                         'updated_at': event['updated_at'],
+                         'title': event['title'],
+                         'start_date': event['start_date'],
+                         'end_date': event['end_date'],
+                         'description': event['description'],
+                         'location': event['location']}
+
+
+def test_create_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict):
+    data = {
+        "title": test_event['title'],
+        "start_date": test_event['start_date'],
+        "end_date": test_event['end_date'],
+        "description": test_event['description'],
+        # participants: Optional[List[schemas_user.UserOut]]  # muss ContactOut sein
+        "location": test_event['location']
+    }
+    response = client.post('/events', json=data)
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data
+    assert 'uuid' in json_data
+    test_event['uuid'] = json_data['uuid']
+    assert 'system_id' in json_data
+    test_event['system_id'] = json_data['system_id']
+    assert 'created_at' in json_data
+    test_event['created_at'] = json_data['created_at']
+    assert 'updated_at' in json_data
+    test_event['updated_at'] = json_data['updated_at']
+    assert validate_event_json(response.json(), test_event)
+
+    async def get_event_by_db():
+        event = await models_event.Event.get(uuid=test_event['uuid'])
+        return event
+
+    event_obj = event_loop.run_until_complete(get_event_by_db())
+    assert event_obj.uuid == UUID(test_event['uuid'])
+
+
+def test_fail_create_event(client: TestClient, test_event: dict):
+    response = client.post('/events')
+    assert response.status_code == 422
+    assert response.json() == {'detail': [{'loc': ['body'],
+                                           'msg': 'field required',
+                                           'type': 'value_error.missing'}]}
+
+    response = client.post('/events', json={})
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': [{'loc': ['body', 'title'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'start_date'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'end_date'], 'msg': 'field required', 'type': 'value_error.missing'}]}
+
+
+def test_get_events_again(client: TestClient, test_event: dict):
+    response = client.get('/events')
+    assert response.status_code == 200
+    assert response.json() == [{'uuid': test_event['uuid'],
+                                'system_id': test_event['system_id'],
+                                'created_at': test_event['created_at'],
+                                'updated_at': test_event['updated_at'],
+                                'title': test_event['title'],
+                                'start_date': test_event['start_date'],
+                                'end_date': test_event['end_date'],
+                                'description': test_event['description'],
+                                'location': test_event['location']}]
+
+
+def test_get_event(client: TestClient, test_event: dict):
+    test_uuid = uuid1()
+    response = client.get(f'/events/{str(test_uuid)}')
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.get(f'/events/{test_event["uuid"]}')
+    assert response.status_code == 200
+    assert validate_event_json(response.json(), test_event)
+
+
+def test_change_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict):
+    test_uuid = uuid1()
+    response = client.put(f'/events/{str(test_uuid)}', json={})
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.put(f'/events/{test_event["uuid"]}', json={'uuid': str(uuid1())})
+    assert response.status_code == 422
+    assert response.json() == {"detail": [
+        {"loc": ["body", "uuid"], "msg": "extra fields not permitted", "type": "value_error.extra"}]}
+
+    response = client.put(f'/events/{test_event["uuid"]}', json={})
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data['updated_at'] != test_event['updated_at']
+    test_event['updated_at'] = json_data['updated_at']
+    assert validate_event_json(response.json(), test_event)
+
+    new_title = 'Änderungs-Test'
+    new_description = 'Hier testen wir ob es sich geändert hat'
+
+    response = client.put(f'/events/{test_event["uuid"]}', json={'title': new_title, 'description': new_description})
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data['title'] != test_event['title'], json_data['title'] == new_title
+    test_event['title'] = new_title
+    assert json_data['description'] != test_event['description'], json_data['description'] == new_description
+    test_event['description'] = new_description
+    assert json_data['updated_at'] != test_event['updated_at']
+    test_event['updated_at'] = json_data['updated_at']
+
+    assert validate_event_json(response.json(), test_event)
+
+    async def get_event_by_db():
+        event = await models_event.Event.get(uuid=test_event['uuid'])
+        return event
+
+    event_obj = event_loop.run_until_complete(get_event_by_db())
+    assert event_obj.title == test_event['title']
+    assert event_obj.description == test_event['description']
+
+
+def test_delete_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict):
+    test_uuid = uuid1()
+    response = client.delete(f'/events/{str(test_uuid)}')
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.delete(f'/events/{test_event["uuid"]}')
+    assert response.status_code == 200
+    assert validate_event_json(response.json(), test_event)
+
+    response = client.get(f'/events/{test_event["uuid"]}')
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    async def is_event_in_db():
+        try:
+            await models_event.Event.get(uuid=test_event['uuid'])
+            return True
+        except:
+            return False
+
+    assert not event_loop.run_until_complete(is_event_in_db())
+
+
+def test_get_events_at_last(client: TestClient):
+    response = client.get('/events')
+    assert response.status_code == 200
+    assert response.json() == []
