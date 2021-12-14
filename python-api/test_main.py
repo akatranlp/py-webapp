@@ -376,10 +376,17 @@ def test_index_template(client: TestClient):
     assert response.headers['content-type'] == 'text/css; charset=utf-8'
 
 
-def test_get_events(client: TestClient):
+def test_get_events(client: TestClient, test_user: dict):
     response = client.get('/events')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/events', headers=headers)
     assert response.status_code == 200
     assert response.json() == []
+    client.cookies.clear_session_cookies()
 
 
 def validate_event_json(json_data, event):
@@ -394,7 +401,7 @@ def validate_event_json(json_data, event):
                          'location': event['location']}
 
 
-def test_create_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict):
+def test_create_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict, test_user: dict):
     data = {
         "title": test_event['title'],
         "start_date": test_event['start_date'],
@@ -403,7 +410,15 @@ def test_create_event(client: TestClient, event_loop: asyncio.AbstractEventLoop,
         # participants: Optional[List[schemas_user.UserOut]]  # muss ContactOut sein
         "location": test_event['location']
     }
+
     response = client.post('/events', json=data)
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.post('/events', json=data, headers=headers)
+
     assert response.status_code == 200
     json_data = response.json()
     assert json_data
@@ -419,29 +434,37 @@ def test_create_event(client: TestClient, event_loop: asyncio.AbstractEventLoop,
 
     async def get_event_by_db():
         event = await models_event.Event.get(uuid=test_event['uuid'])
+        await event.fetch_related('creator')
         return event
 
     event_obj = event_loop.run_until_complete(get_event_by_db())
     assert event_obj.uuid == UUID(test_event['uuid'])
+    assert event_obj.creator.id == test_user['id']
+    client.cookies.clear_session_cookies()
 
 
-def test_fail_create_event(client: TestClient, test_event: dict):
-    response = client.post('/events')
+def test_fail_create_event(client: TestClient, test_event: dict, test_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.post('/events', headers=headers)
     assert response.status_code == 422
     assert response.json() == {'detail': [{'loc': ['body'],
                                            'msg': 'field required',
                                            'type': 'value_error.missing'}]}
 
-    response = client.post('/events', json={})
+    response = client.post('/events', headers=headers, json={})
     assert response.status_code == 422
     assert response.json() == {
         'detail': [{'loc': ['body', 'title'], 'msg': 'field required', 'type': 'value_error.missing'},
                    {'loc': ['body', 'start_date'], 'msg': 'field required', 'type': 'value_error.missing'},
                    {'loc': ['body', 'end_date'], 'msg': 'field required', 'type': 'value_error.missing'}]}
+    client.cookies.clear_session_cookies()
 
 
-def test_get_events_again(client: TestClient, test_event: dict):
-    response = client.get('/events')
+def test_get_events_again(client: TestClient, test_event: dict, test_user: dict, admin_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/events', headers=headers)
     assert response.status_code == 200
     assert response.json() == [{'uuid': test_event['uuid'],
                                 'system_id': test_event['system_id'],
@@ -453,30 +476,57 @@ def test_get_events_again(client: TestClient, test_event: dict):
                                 'description': test_event['description'],
                                 'location': test_event['location']}]
 
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/events', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()
 
-def test_get_event(client: TestClient, test_event: dict):
+
+def test_get_event(client: TestClient, test_event: dict, test_user: dict, admin_user: dict):
     test_uuid = uuid1()
     response = client.get(f'/events/{str(test_uuid)}')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get(f'/events/{str(test_uuid)}', headers=headers)
     assert response.status_code == 404
     assert response.json() == {'detail': 'Object does not exist'}
 
-    response = client.get(f'/events/{test_event["uuid"]}')
+    response = client.get(f'/events/{test_event["uuid"]}', headers=headers)
     assert response.status_code == 200
     assert validate_event_json(response.json(), test_event)
 
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get(f'/events/{test_event["uuid"]}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+    client.cookies.clear_session_cookies()
 
-def test_change_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict):
+
+def test_change_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict, test_user: dict,
+                      admin_user: dict):
     test_uuid = uuid1()
     response = client.put(f'/events/{str(test_uuid)}', json={})
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.put(f'/events/{str(test_uuid)}', headers=headers, json={})
     assert response.status_code == 404
     assert response.json() == {'detail': 'Object does not exist'}
 
-    response = client.put(f'/events/{test_event["uuid"]}', json={'uuid': str(uuid1())})
+    response = client.put(f'/events/{test_event["uuid"]}', headers=headers, json={'uuid': str(uuid1())})
     assert response.status_code == 422
     assert response.json() == {"detail": [
         {"loc": ["body", "uuid"], "msg": "extra fields not permitted", "type": "value_error.extra"}]}
 
-    response = client.put(f'/events/{test_event["uuid"]}', json={})
+    response = client.put(f'/events/{test_event["uuid"]}', headers=headers, json={})
     assert response.status_code == 200
     json_data = response.json()
     assert json_data['updated_at'] != test_event['updated_at']
@@ -486,7 +536,8 @@ def test_change_event(client: TestClient, event_loop: asyncio.AbstractEventLoop,
     new_title = 'Änderungs-Test'
     new_description = 'Hier testen wir ob es sich geändert hat'
 
-    response = client.put(f'/events/{test_event["uuid"]}', json={'title': new_title, 'description': new_description})
+    response = client.put(f'/events/{test_event["uuid"]}', headers=headers,
+                          json={'title': new_title, 'description': new_description})
     assert response.status_code == 200
     json_data = response.json()
     assert json_data['title'] != test_event['title'], json_data['title'] == new_title
@@ -506,18 +557,38 @@ def test_change_event(client: TestClient, event_loop: asyncio.AbstractEventLoop,
     assert event_obj.title == test_event['title']
     assert event_obj.description == test_event['description']
 
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.put(f'/events/{test_event["uuid"]}', headers=headers,
+                          json={'title': new_title, 'description': new_description})
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+    client.cookies.clear_session_cookies()
 
-def test_delete_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict):
+
+def test_delete_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict, test_user: dict, admin_user: dict):
     test_uuid = uuid1()
     response = client.delete(f'/events/{str(test_uuid)}')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.delete(f'/events/{test_event["uuid"]}', headers=headers)
     assert response.status_code == 404
     assert response.json() == {'detail': 'Object does not exist'}
 
-    response = client.delete(f'/events/{test_event["uuid"]}')
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.delete(f'/events/{str(test_uuid)}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.delete(f'/events/{test_event["uuid"]}', headers=headers)
     assert response.status_code == 200
     assert validate_event_json(response.json(), test_event)
 
-    response = client.get(f'/events/{test_event["uuid"]}')
+    response = client.get(f'/events/{test_event["uuid"]}', headers=headers)
     assert response.status_code == 404
     assert response.json() == {'detail': 'Object does not exist'}
 
@@ -529,9 +600,13 @@ def test_delete_event(client: TestClient, event_loop: asyncio.AbstractEventLoop,
             return False
 
     assert not event_loop.run_until_complete(is_event_in_db())
+    client.cookies.clear_session_cookies()
 
 
-def test_get_events_at_last(client: TestClient):
-    response = client.get('/events')
+def test_get_events_at_last(client: TestClient, test_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/events', headers=headers)
     assert response.status_code == 200
     assert response.json() == []
+    client.cookies.clear_session_cookies()

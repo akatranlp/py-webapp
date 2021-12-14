@@ -6,27 +6,21 @@ from ..schemas import schemas_event
 from ..models import models_event, models_user
 
 
-# TODO eingrenzen auf aktuell eingeloggten User
-async def get_all() -> List[schemas_event.EventOut]:
+async def get_all(user: models_user.User) -> List[schemas_event.EventOut]:
     event_list = []
-    async for event_obj in models_event.Event.all():
+    async for event_obj in models_event.Event.filter(creator=user):
         event_list.append(await schemas_event.EventOut.from_tortoise_orm(event_obj))
     return event_list
 
 
-async def create_event(event: schemas_event.EventIn) -> schemas_event.EventOut:
-    # vorrübergehend den ersten user nehmen als creator
-    try:
-        user_obj = await models_user.User.first()
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='kein user vorhanden')
-
+# TODO participants fehlen noch
+async def create_event(event: schemas_event.EventIn, user: models_user.User) -> schemas_event.EventOut:
     event_obj = models_event.Event(
         title=event.title,
         start_date=event.start_date,
         end_date=event.end_date,
         description=event.description,
-        creator=user_obj,
+        creator=user,
         # participants = None,
         location=event.location)
     try:
@@ -36,19 +30,20 @@ async def create_event(event: schemas_event.EventIn) -> schemas_event.EventOut:
     return await schemas_event.EventOut.from_tortoise_orm(event_obj)
 
 
-async def _get_event(uuid: UUID):
-    event = await models_event.Event.get(uuid=uuid)
+async def _get_event(uuid: UUID, user: models_user.User):
+    event = await models_event.Event.get(uuid=uuid, creator=user)
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Event does not exist')
     return event
 
 
-async def get_event(uuid: UUID):
-    return await schemas_event.EventOut.from_tortoise_orm(await _get_event(uuid))
+async def get_event(uuid: UUID, user: models_user.User):
+    return await schemas_event.EventOut.from_tortoise_orm(await _get_event(uuid, user))
 
 
-async def change_event(uuid: UUID, event: schemas_event.EventPut):
-    event_obj = await _get_event(uuid)
+# TODO participants fehlen noch
+async def change_event(uuid: UUID, event: schemas_event.EventPut, user: models_user.User):
+    event_obj = await _get_event(uuid, user)
     if event.title:
         event_obj.title = event.title
     if event.start_date:
@@ -65,8 +60,8 @@ async def change_event(uuid: UUID, event: schemas_event.EventPut):
     return await schemas_event.EventOut.from_tortoise_orm(event_obj)
 
 
-async def delete_event(uuid: UUID):
-    event_obj = await _get_event(uuid)
+async def delete_event(uuid: UUID, user: models_user.User):
+    event_obj = await _get_event(uuid, user)
     event = await schemas_event.EventOut.from_tortoise_orm(event_obj)
     await event_obj.delete()
     return event
