@@ -588,7 +588,8 @@ def test_change_event(client: TestClient, event_loop: asyncio.AbstractEventLoop,
     client.cookies.clear_session_cookies()
 
 
-def test_delete_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict, test_user: dict, admin_user: dict):
+def test_delete_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict, test_user: dict,
+                      admin_user: dict):
     test_uuid = uuid1()
     response = client.delete(f'/events/{str(test_uuid)}')
     assert response.status_code == 401
@@ -817,7 +818,8 @@ def test_change_contact(client: TestClient, event_loop: asyncio.AbstractEventLoo
     client.cookies.clear_session_cookies()
 
 
-def test_delete_contact(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_contact: dict, test_user: dict, admin_user: dict):
+def test_delete_contact(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_contact: dict, test_user: dict,
+                        admin_user: dict):
     test_uuid = uuid1()
     response = client.delete(f'/contacts/{str(test_uuid)}')
     assert response.status_code == 401
@@ -869,6 +871,30 @@ def test_get_todos(client: TestClient, test_user: dict):
     assert response.status_code == 401
     assert response.json() == {'detail': 'Not authenticated'}
 
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/todos', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()
+
+
+def test_get_finished_todos(client: TestClient, test_user: dict):
+    response = client.get('/todos?is_finished=true')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/todos', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()
+
+
+def test_get_unfinished_todos(client: TestClient, test_user: dict):
+    response = client.get('/todos?is_finished=false')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
     token = login(client, test_user)
     headers = {'Authorization': f'Bearer {token}'}
     response = client.get('/todos', headers=headers)

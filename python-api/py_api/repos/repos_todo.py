@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -7,36 +7,11 @@ from ..models import models_todo
 from ..models import models_user
 
 
-# Alle Todos ausgeben
-async def get_all() -> List[schemas_todo.TodoOut]:
-    todo_list = []
-    async for todo_obj in models_todo.Todo.all():
-        todo_list.append(await schemas_todo.TodoOut.from_tortoise_orm(todo_obj))
-    return todo_list  # ggf. nur return models_todo.üTodo.all()?
-
-
-# Alle fertigen Todos ausgeben
-async def get_all_finished() -> List[schemas_todo.TodoOut]:
-    todo_list = []
-    async for todo_obj in models_todo.Todo.all():
-        if todo_obj.status:
-            todo_list.append(await schemas_todo.TodoOut.from_tortoise_orm(todo_obj))
-    return todo_list
-
-
-# Alle unfertigen Todos ausgeben
-async def get_all_unfinished() -> List[schemas_todo.TodoOut]:
-    todo_list = []
-    async for todo_obj in models_todo.Todo.all():
-        if not todo_obj.status:
-            todo_list.append(await schemas_todo.TodoOut.from_tortoise_orm(todo_obj))
-    return todo_list
-
-
 # Alle Todos eines Nutzers ausgeben
-async def get_all_from_user(user: models_user.User) -> List[schemas_todo.TodoOut]:
+async def get_all(user: models_user.User, is_finished: Optional[bool]) -> List[schemas_todo.TodoOut]:
     todo_list = []
-    async for todo_obj in models_todo.Todo.filter(creator=user):
+    async for todo_obj in models_todo.Todo.filter(creator=user) if is_finished is None else models_todo.Todo.filter(
+            status=is_finished, creator=user):
         todo_list.append(await schemas_todo.TodoOut.from_tortoise_orm(todo_obj))
     return todo_list
 
