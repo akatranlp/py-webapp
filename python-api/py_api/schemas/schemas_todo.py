@@ -5,15 +5,20 @@ from pydantic import BaseModel
 from ..models import models_todo
 
 Todo = pydantic_model_creator(models_todo.Todo, name='Todo')
+
+# Eigentlich unnötig, aber für den Fall, das excludes noch hinzugefügt werden erstellt:
 TodoIn = pydantic_model_creator(models_todo.Todo,
                                 name='TodoIn',
-                                exclude_readonly=True
+                                exclude_readonly=True,
                                 # Bin mit mit den excludes nicht so ganz sicher?
+                                exclude=('status',)
                                 )
 
 TodoOut = pydantic_model_creator(models_todo.Todo,
                                  name='TodoOut',
                                  exclude_readonly=True)
+
+
 
 
 class TodoPut(BaseModel):
