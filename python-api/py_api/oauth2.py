@@ -12,7 +12,7 @@ def check_permission(user: schemas_user.User):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='you are not permitted to do that')
 
 
-async def get_current_user(token_data: str = Depends(oauth2_schema)) -> schemas_user.User:
+async def get_current_user(token_data: str = Depends(oauth2_schema)) -> models_user.User:
     exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid credentials')
     return await jwt_token.verify_access_token(token_data, exception)
 
@@ -20,9 +20,14 @@ async def get_current_user(token_data: str = Depends(oauth2_schema)) -> schemas_
 async def get_current_active_user(user: schemas_user.User = Depends(get_current_user)) -> schemas_user.User:
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='you are blocked')
+    return await schemas_user.User.from_tortoise_orm(user)
+
+
+async def get_current_active_user_model(user: schemas_user.User = Depends(get_current_user)) -> models_user.User:
+    if not user.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='you are blocked')
     return user
 
 
-async def get_out_user(user: schemas_user.User = Depends(get_current_active_user)) -> schemas_user.UserOut:
-    user_obj = await models_user.User.get(id=user.id)
-    return await schemas_user.UserOut.from_tortoise_orm(user_obj)
+async def get_out_user(user: schemas_user.User = Depends(get_current_active_user_model)) -> schemas_user.UserOut:
+    return await schemas_user.UserOut.from_tortoise_orm(user)
