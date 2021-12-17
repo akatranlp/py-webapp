@@ -1,6 +1,8 @@
 import asyncio
 import time
 from typing import Generator
+from uuid import UUID, uuid1
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -23,7 +25,7 @@ Config.get_instance().set_config_value('JWT_ACCESS_TOKEN_SECRET', jwt_access_sec
 Config.get_instance().set_config_value('JWT_REFRESH_TOKEN_SECRET', jwt_refresh_secret)
 
 from main import app
-from py_api.models import models_user
+from py_api.models import models_user, models_todo
 
 
 @pytest.fixture(scope='module')
@@ -57,6 +59,15 @@ def client() -> Generator:
 @pytest.fixture(scope='module')
 def event_loop(client: TestClient) -> Generator:
     yield asyncio.get_event_loop()
+
+
+@pytest.fixture(scope='module')
+def test_todo() -> Generator:
+    yield {'uuid': None,
+           'system_id': None,
+           'title': 'Test-ToDo',
+           'status': 'False',
+           'description': 'Dies ist ein Test Todo, hoho'}
 
 
 def test_read_main(client: TestClient):
@@ -362,3 +373,169 @@ def test_index_template(client: TestClient):
     response = client.get('/static/css/index.css')
     assert response.status_code == 200
     assert response.headers['content-type'] == 'text/css; charset=utf-8'
+
+
+# ---------------------_ToDo Tests_---------------------
+def test_get_todos(client: TestClient, test_user: dict):
+    response = client.get('/todos')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/todos', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()
+
+
+def validate_todo_json(json_data, todo):
+    return json_data == {'uuid': todo['uuid'],
+                         'system_id': todo['system_id'],
+                         'title': todo['title'],
+                         'status': todo['status'],
+                         'description': todo['description']}
+
+
+def test_create_todo(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_todo: dict, test_user: dict):
+    data = {
+        "title": test_todo['title'],
+        "status": test_todo['status'],
+        "description": test_todo['description']
+    }
+
+    response = client.post('/todos', json=data)
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.post('/todos', json=data, headers=headers)
+
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data
+    assert 'uuid' in json_data
+    test_todo['uuid'] = json_data['uuid']
+    assert 'system_id' in json_data
+    test_todo['system_id'] = json_data['system_id']
+
+    assert validate_todo_json(response.json(), test_todo)
+
+    async def get_todo_by_db():
+        event = await models_todo.Todo.get(uuid=test_todo['uuid'])
+        await event.fetch_related('creator')
+        return event
+
+    todo_obj = event_loop.run_until_complete(get_todo_by_db())
+    assert todo_obj.uuid == UUID(test_todo['uuid'])
+    assert todo_obj.creator.id == test_user['id']
+    client.cookies.clear_session_cookies()
+
+
+def test_fail_create_todo(client: TestClient, test_todo: dict, test_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.post('/todos', headers=headers)
+    assert response.status_code == 422
+    assert response.json() == {'detail': [{'loc': ['body'],
+                                           'msg': 'field required',
+                                           'type': 'value_error.missing'}]}
+
+    response = client.post('/todos', headers=headers, json={})
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': [{'loc': ['body', 'title'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'start_date'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'end_date'], 'msg': 'field required', 'type': 'value_error.missing'}]}
+    client.cookies.clear_session_cookies()
+
+
+def test_get_todos_again(client: TestClient, test_todo: dict, test_user: dict, admin_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/todos', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == [{'uuid': test_todo['uuid'],
+                                'system_id': test_todo['system_id'],
+                                'title': test_todo['title'],
+                                'status': test_todo['status'],
+                                'description': test_todo['description']}]
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/todos', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()
+
+
+def test_get_todo(client: TestClient, test_todo: dict, test_user: dict, admin_user: dict):
+    test_uuid = uuid1()
+    response = client.get(f'/todos/{str(test_uuid)}')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get(f'/todos/{str(test_uuid)}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.get(f'/todos/{test_todo["uuid"]}', headers=headers)
+    assert response.status_code == 200
+    assert validate_todo_json(response.json(), test_todo)
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get(f'/todos/{test_todo["uuid"]}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+    client.cookies.clear_session_cookies()
+
+
+def test_delete_todo(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_todo: dict, test_user: dict,
+                     admin_user: dict):
+    test_uuid = uuid1()
+    response = client.delete(f'/todos/{str(test_uuid)}')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.delete(f'/todos/{test_todo["uuid"]}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.delete(f'/todos/{str(test_uuid)}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.delete(f'/todos/{test_todo["uuid"]}', headers=headers)
+    assert response.status_code == 200
+    assert validate_todo_json(response.json(), test_todo)
+
+    response = client.get(f'/events/{test_todo["uuid"]}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    async def is_event_in_db():
+        try:
+            await models_todo.Todo.get(uuid=test_todo['uuid'])
+            return True
+        except:
+            return False
+
+    assert not event_loop.run_until_complete(is_event_in_db())
+    client.cookies.clear_session_cookies()
+
+
+def test_get_todos_at_last(client: TestClient, test_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/todos', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()

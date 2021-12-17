@@ -16,10 +16,16 @@ router = APIRouter(
 )
 
 
+# Alle eigenen Todos ausgeben
+@router.get("/", response_model=List[schemas_todo.TodoOut])
+async def mytodos(user: schemas_user.User = Depends(oauth2.get_current_active_user_model)) -> List[schemas_todo.TodoOut]:
+    return repos_todo.get_all_from_user(user)  ##Todo hier das Problem fixen?
+
+
 # Alle Todos ausgeben
-@router.get('/', response_model=List[schemas_todo.TodoOut])
-async def get_all() -> List[schemas_todo.TodoOut]:
-    return await repos_todo.get_all()
+# @router.get('/', response_model=List[schemas_todo.TodoOut])
+# async def get_all() -> List[schemas_todo.TodoOut]:
+#     return await repos_todo.get_all()
 
 
 # Alle unfertigen Todos ausgeben
@@ -34,13 +40,8 @@ async def get_all_finished() -> List[schemas_todo.TodoOut]:
     return await repos_todo.get_all_finished()
 
 
-# Eigene Todos ausgeben
-@router.get("/mytodos", response_model=List[schemas_todo.TodoOut])
-async def mytodos(user: schemas_user.User = Depends(oauth2.get_out_user)) -> List[schemas_todo.TodoOut]:
-    return repos_todo.get_all_from_user(user)  ##Todo hier das Problem fixen?
-
-
 # Vielleicht noch zu implementieren: Alle Todos eines speziellen Nutzers ausgeben
+
 
 # Ein spezifischen _Todo ausgeben
 @router.get('/{uuid}', response_model=schemas_todo.TodoOut)
