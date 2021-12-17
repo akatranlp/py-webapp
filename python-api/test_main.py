@@ -646,7 +646,7 @@ def validate_contact_json(json_data, contact):
                          'email': contact['email']}
 
 
-def test_create_contact(client: TestClient, event_loop, test_contact: dict, test_user: dict):
+def test_create_contact(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_contact: dict, test_user: dict):
     data = {
         "name": test_contact['name'],
         "firstname": test_contact['firstname'],
@@ -748,7 +748,7 @@ def test_get_contact(client: TestClient, test_contact: dict, test_user: dict, ad
     client.cookies.clear_session_cookies()
 
 
-def test_change_contact(client: TestClient, event_loop, test_contact: dict, test_user: dict,
+def test_change_contact(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_contact: dict, test_user: dict,
                         admin_user: dict):
     test_uuid = uuid1()
     response = client.put(f'/contacts/{str(test_uuid)}', json={})
@@ -806,7 +806,7 @@ def test_change_contact(client: TestClient, event_loop, test_contact: dict, test
     client.cookies.clear_session_cookies()
 
 
-def test_delete_contact(client: TestClient, event_loop, test_contact: dict, test_user: dict, admin_user: dict):
+def test_delete_contact(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_contact: dict, test_user: dict, admin_user: dict):
     test_uuid = uuid1()
     response = client.delete(f'/contacts/{str(test_uuid)}')
     assert response.status_code == 401
