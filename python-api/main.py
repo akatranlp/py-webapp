@@ -3,7 +3,7 @@ from typing import List
 from py_api.plugins.plugin_helper import PluginLoader, PluginSchema
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from py_api.routers import routers_user, routers_auth, routers_client
+from py_api.routers import routers_user, routers_auth, routers_client, routers_todo
 from tortoise.contrib.fastapi import register_tortoise
 from py_api.config import Config
 
