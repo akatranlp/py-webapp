@@ -1,5 +1,5 @@
 from tortoise.contrib.pydantic import pydantic_model_creator
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 from ..models import models_user
 
 User = pydantic_model_creator(models_user.User, name='User')
@@ -31,7 +31,13 @@ class UserChangePassword(BaseModel):
     old_password: str
     new_password: str
 
+    class Config:
+        extra = Extra.forbid
+
 
 class UserToken(BaseModel):
     access_token: str
     token_type: str
+
+    class Config:
+        extra = Extra.forbid
