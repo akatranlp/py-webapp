@@ -5,7 +5,6 @@ from fastapi import HTTPException, status
 from ..schemas import schemas_todo
 from ..models import models_todo
 from ..models import models_user
-from .. import hashing
 
 
 # Alle Todos ausgeben
@@ -37,7 +36,7 @@ async def get_all_unfinished() -> List[schemas_todo.TodoOut]:
 # Alle Todos eines Nutzers ausgeben
 async def get_all_from_user(user: models_user.User) -> List[schemas_todo.TodoOut]:
     todo_list = []
-    async for todo_obj in models_todo.Todo.filter(creator=user): ##TODO: was ist besser, mit if überprüfen oder per filter? GGF die anderen umschreiben mit Filter.
+    async for todo_obj in models_todo.Todo.filter(creator=user):
         todo_list.append(await schemas_todo.TodoOut.from_tortoise_orm(todo_obj))
     return todo_list
 
@@ -64,7 +63,8 @@ async def create_todo(todo: schemas_todo.TodoIn, user: models_user.User) -> sche
         creator=user)
     try:
         await todo_obj.save()
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Beim Erstellen des ToDos ist ein Fehler aufgetreten.')
     return await schemas_todo.TodoOut.from_tortoise_orm(todo_obj)

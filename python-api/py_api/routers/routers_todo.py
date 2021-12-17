@@ -2,7 +2,6 @@ from typing import List
 from uuid import UUID
 
 from fastapi import Depends
-from ..repos import repos_todo
 from .. import oauth2
 from ..schemas import schemas_user
 from ..schemas import schemas_todo
@@ -18,8 +17,8 @@ router = APIRouter(
 
 # Alle eigenen Todos ausgeben
 @router.get("/", response_model=List[schemas_todo.TodoOut])
-async def mytodos(user: schemas_user.User = Depends(oauth2.get_current_active_user_model)) -> List[schemas_todo.TodoOut]:
-    return repos_todo.get_all_from_user(user)  ##Todo hier das Problem fixen?
+async def my_todos(user: schemas_user.User = Depends(oauth2.get_current_active_user_model)) -> List[schemas_todo.TodoOut]:
+    return await repos_todo.get_all_from_user(user)
 
 
 # Alle Todos ausgeben
@@ -45,7 +44,7 @@ async def get_all_finished() -> List[schemas_todo.TodoOut]:
 
 # Ein spezifischen _Todo ausgeben
 @router.get('/{uuid}', response_model=schemas_todo.TodoOut)
-async def get_event(uuid: UUID,
+async def get_todo(uuid: UUID,
                     user: models_user.User =
                     Depends(oauth2.get_current_active_user_model)) -> schemas_todo.TodoOut:
     return await repos_todo.get_todo(uuid, user)
@@ -53,7 +52,7 @@ async def get_event(uuid: UUID,
 
 # Ein To-Do erstellen
 @router.post('/', response_model=schemas_todo.TodoOut)
-async def create_event(todo: schemas_todo.TodoIn,
+async def create_todo(todo: schemas_todo.TodoIn,
                        user: models_user.User =
                        Depends(oauth2.get_current_active_user_model)) -> schemas_todo.TodoOut:
     return await repos_todo.create_todo(todo, user)
