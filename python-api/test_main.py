@@ -24,7 +24,7 @@ Config.get_instance().set_config_value('JWT_ACCESS_TOKEN_SECRET', jwt_access_sec
 Config.get_instance().set_config_value('JWT_REFRESH_TOKEN_SECRET', jwt_refresh_secret)
 
 from main import app
-from py_api.models import models_user, models_event
+from py_api.models import models_user, models_event, models_contact
 
 
 @pytest.fixture(scope='module')
@@ -47,6 +47,17 @@ def admin_user() -> Generator:
         'password_hash': None,
         'email': 'admin@test.com'
     }
+
+
+@pytest.fixture(scope='module')
+def test_contact() -> Generator:
+    yield {'uuid': None,
+           'system_id': None,
+           'created_at': None,
+           'updated_at': None,
+           'name': 'Test-Name',
+           'firstname': 'Test-Vorname',
+           'email': 'test@test.de'}
 
 
 @pytest.fixture(scope='module')
@@ -607,6 +618,235 @@ def test_get_events_at_last(client: TestClient, test_user: dict):
     token = login(client, test_user)
     headers = {'Authorization': f'Bearer {token}'}
     response = client.get('/events', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()
+
+
+def test_get_contacts(client: TestClient, test_user: dict):
+    response = client.get('/contacts')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/contacts', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()
+
+
+def validate_contact_json(json_data, contact):
+    return json_data == {'uuid': contact['uuid'],
+                         'system_id': contact['system_id'],
+                         'created_at': contact['created_at'],
+                         'updated_at': contact['updated_at'],
+                         'name': contact['name'],
+                         'firstname': contact['firstname'],
+                         'email': contact['email']}
+
+
+def test_create_contact(client: TestClient, event_loop, test_contact: dict, test_user: dict):
+    data = {
+        "name": test_contact['name'],
+        "firstname": test_contact['firstname'],
+        "email": test_contact['email']
+    }
+
+    response = client.post('/contacts', json=data)
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.post('/contacts', json=data, headers=headers)
+
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data
+    assert 'uuid' in json_data
+    test_contact['uuid'] = json_data['uuid']
+    assert 'system_id' in json_data
+    test_contact['system_id'] = json_data['system_id']
+    assert 'created_at' in json_data
+    test_contact['created_at'] = json_data['created_at']
+    assert 'updated_at' in json_data
+    test_contact['updated_at'] = json_data['updated_at']
+    assert validate_contact_json(response.json(), test_contact)
+
+    async def get_contact_by_db():
+        contact = await models_contact.Contact.get(uuid=test_contact['uuid'])
+        await contact.fetch_related('creator')
+        return contact
+
+    contact_obj = event_loop.run_until_complete(get_contact_by_db())
+    assert contact_obj.uuid == UUID(test_contact['uuid'])
+    assert contact_obj.creator.id == test_user['id']
+    client.cookies.clear_session_cookies()
+
+
+def test_fail_create_contact(client: TestClient, test_contact: dict, test_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.post('/contacts', headers=headers)
+    assert response.status_code == 422
+    assert response.json() == {'detail': [{'loc': ['body'],
+                                           'msg': 'field required',
+                                           'type': 'value_error.missing'}]}
+
+    response = client.post('/contacts', headers=headers, json={})
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': [{'loc': ['body', 'name'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'firstname'], 'msg': 'field required', 'type': 'value_error.missing'},
+                   {'loc': ['body', 'email'], 'msg': 'field required', 'type': 'value_error.missing'}]}
+    client.cookies.clear_session_cookies()
+
+
+def test_get_contacts_again(client: TestClient, test_contact: dict, test_user: dict, admin_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/contacts', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == [{'uuid': test_contact['uuid'],
+                                'system_id': test_contact['system_id'],
+                                'created_at': test_contact['created_at'],
+                                'updated_at': test_contact['updated_at'],
+                                'name': test_contact['name'],
+                                'firstname': test_contact['firstname'],
+                                'email': test_contact['email']}]
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/contacts', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == []
+    client.cookies.clear_session_cookies()
+
+
+def test_get_contact(client: TestClient, test_contact: dict, test_user: dict, admin_user: dict):
+    test_uuid = uuid1()
+    response = client.get(f'/contacts/{str(test_uuid)}')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get(f'/contacts/{str(test_uuid)}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.get(f'/contacts/{test_contact["uuid"]}', headers=headers)
+    assert response.status_code == 200
+    assert validate_contact_json(response.json(), test_contact)
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get(f'/contacts/{test_contact["uuid"]}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+    client.cookies.clear_session_cookies()
+
+
+def test_change_contact(client: TestClient, event_loop, test_contact: dict, test_user: dict,
+                        admin_user: dict):
+    test_uuid = uuid1()
+    response = client.put(f'/contacts/{str(test_uuid)}', json={})
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.put(f'/contacts/{str(test_uuid)}', headers=headers, json={})
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.put(f'/contacts/{test_contact["uuid"]}', headers=headers, json={'uuid': str(uuid1())})
+    assert response.status_code == 422
+    assert response.json() == {"detail": [
+        {"loc": ["body", "uuid"], "msg": "extra fields not permitted", "type": "value_error.extra"}]}
+
+    response = client.put(f'/contacts/{test_contact["uuid"]}', headers=headers, json={})
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data['updated_at'] != test_contact['updated_at']
+    test_contact['updated_at'] = json_data['updated_at']
+    assert validate_contact_json(response.json(), test_contact)
+
+    new_name = 'Anderer Name'
+    new_firstname = 'Anderer Vorname'
+
+    response = client.put(f'/contacts/{test_contact["uuid"]}', headers=headers,
+                          json={'name': new_name, 'firstname': new_firstname})
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data['name'] != test_contact['name'], json_data['name'] == new_name
+    test_contact['name'] = new_name
+    assert json_data['firstname'] != test_contact['firstname'], json_data['firstname'] == new_firstname
+    test_contact['firstname'] = new_firstname
+    assert json_data['updated_at'] != test_contact['updated_at']
+    test_contact['updated_at'] = json_data['updated_at']
+
+    assert validate_contact_json(response.json(), test_contact)
+
+    async def get_contact_by_db():
+        contact = await models_contact.Contact.get(uuid=test_contact['uuid'])
+        return contact
+
+    contact_obj = event_loop.run_until_complete(get_contact_by_db())
+    assert contact_obj.name == test_contact['name']
+    assert contact_obj.firstname == test_contact['firstname']
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.put(f'/contacts/{test_contact["uuid"]}', headers=headers,
+                          json={'name': new_name, 'firstname': new_firstname})
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+    client.cookies.clear_session_cookies()
+
+
+def test_delete_contact(client: TestClient, event_loop, test_contact: dict, test_user: dict, admin_user: dict):
+    test_uuid = uuid1()
+    response = client.delete(f'/contacts/{str(test_uuid)}')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.delete(f'/contacts/{test_contact["uuid"]}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.delete(f'/contacts/{str(test_uuid)}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    response = client.delete(f'/contacts/{test_contact["uuid"]}', headers=headers)
+    assert response.status_code == 200
+    assert validate_contact_json(response.json(), test_contact)
+
+    response = client.get(f'/contacts/{test_contact["uuid"]}', headers=headers)
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+    async def is_contact_in_db():
+        try:
+            await models_contact.Contact.get(uuid=test_contact['uuid'])
+            return True
+        except:
+            return False
+
+    assert not event_loop.run_until_complete(is_contact_in_db())
+    client.cookies.clear_session_cookies()
+
+
+def test_get_contacts_at_last(client: TestClient, test_user: dict):
+    token = login(client, test_user)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = client.get('/contacts', headers=headers)
     assert response.status_code == 200
     assert response.json() == []
     client.cookies.clear_session_cookies()

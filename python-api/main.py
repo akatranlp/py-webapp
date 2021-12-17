@@ -3,7 +3,7 @@ from typing import List
 from py_api.plugins.plugin_helper import PluginLoader, PluginSchema
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from py_api.routers import routers_user, routers_auth, routers_client, routers_event
+from py_api.routers import routers_user, routers_auth, routers_client, routers_event, routers_contact
 from tortoise.contrib.fastapi import register_tortoise
 from py_api.config import Config
 
@@ -49,6 +49,7 @@ app.include_router(routers_auth.router)
 app.include_router(routers_user.router)
 app.include_router(routers_client.router)
 app.include_router(routers_event.router)
+app.include_router(routers_contact.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
