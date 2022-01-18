@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ToDo-Liste</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="/js/todo.js"></script>
+</head>
+<body>
+<!-- Navigationsleiste -->
+<nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
+    <!-- Logindaten -->
+    <div class="row pl-3">
+        <a class="loggedIn btn btn-danger mr-sm-2" href="login.html">Ausloggen</a>
+        <div>
+            <p class="loggedIn text-white text-justify m-2 mr-4">Eingeloggt als: <b class="text-white"
+                                                                                    id="loggedUser"></b>
+            </p>
+        </div>
+    </div>
+    <!-- Kalender und Adressbuch -->
+    <div>
+        <a class="btn btn-success mr-sm-2" href="calender.html">Kalender</a>
+        <a class="btn btn-warning mr-sm-2" href="contacts.html">Adressbuch</a>
+    </div>
+</nav>
+
+<!-- Seiteninhalt -->
+
+<div class="container mt-5">
+    <div class="justify-content-center">
+        <div class="col-auto">
+            <table class="table" width="100%">
+                <tr>
+                    <th class="">ToDo</th> <!-- Gedacht später als Knöpfe zu dienen, um zwischen un-/fertig zu wechseln -->
+                    <th class="">Erledigt</th>
+                </tr>
+            </table>
+            <div class="column p-2 border border-info rounded highlight">
+                <p>Todo 1</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
