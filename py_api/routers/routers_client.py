@@ -22,3 +22,8 @@ async def get_login(request: Request):
 @router.get('/register', response_class=HTMLResponse, include_in_schema=False)
 async def get_login(request: Request):
     return templates.TemplateResponse('register.html', {'request': request})
+
+
+@router.get('/my_profile', response_class=HTMLResponse, include_in_schema=False)
+async def get_login(request: Request):
+    return templates.TemplateResponse('my_profile.html', {'request': request})
