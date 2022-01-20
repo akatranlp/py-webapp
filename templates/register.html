@@ -7,6 +7,8 @@
     <title>Register</title>
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', path='/js/register.js') }}" defer></script>
 </head>
 
 <body>
@@ -15,30 +17,36 @@
 <nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
     <!-- Startseite & Logindaten -->
     <div class="row pl-3">
-        <a class="loggedIn btn btn-light mr-sm-2" href="login">Login</a>
+        <a class="loggedIn btn btn-light mr-sm-2" href="/login">Login</a>
     </div>
 </nav>
 
 <div class="container mt-5">
     <div class="border rounded p-2 container-sm bg-primary">
         <h1 class="text-white">Register</h1>
-        <form class="m-0" action="${pageContext.request.contextPath}/registerServlet" method="post">
+        <form class="m-0" data-form action="" method="post">
             <div class="row mb-3">
                 <label for="registerUsername" class="col-sm-2 col-form-label text-white">Username</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="registerUsername" name="registerUsername" required>
+                    <input type="text" class="form-control" id="registerUsername" name="username" required>
                 </div>
             </div>
             <div class="row mb-3">
                 <label for="registerEmail" class="col-sm-2 col-form-label text-white">E-Mail</label>
                 <div class="col-sm-10">
-                    <input type="email" class="form-control" id="registerEmail" name="registerEmail" required>
+                    <input type="email" class="form-control" id="registerEmail" name="email" required>
                 </div>
             </div>
             <div class="row mb-3">
                 <label for="registerPassword" class="col-sm-2 col-form-label text-white">Password</label>
                 <div class="col-sm-10">
-                    <input type="password" class="form-control" id="registerPassword" name="registerPassword" required>
+                    <input type="password" class="form-control" id="registerPassword" name="password" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="registerPassword2" class="col-sm-2 col-form-label text-white">Password wiederholen</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="registerPassword2" name="password2" required>
                 </div>
             </div>
             <button type="submit" class="btn btn-secondary">Register</button>
