@@ -6,19 +6,42 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', path='/js/login.js') }}" defer></script>
 </head>
 
 <body>
 
-    <form method="post" id="form">
-        <label for="username">Username:</label><br>
-        <input type="text" name="username" id="user"><br><br>
-        <label for="password">Password:</label><br>
-        <input type="text" name="password" id="pass"><br><br>
-        <input type="submit" value="Anmelden">
-    </form>
+<!-- Navigationsleiste -->
+<nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
+    <!-- Startseite & Logindaten -->
+    <div class="row pl-3">
+        <a class="loggedIn btn btn-light mr-sm-2" href="register">Register</a>
+    </div>
+</nav>
 
-
+<div class="container mt-5">
+    <div class="border rounded p-2 container-sm bg-primary">
+        <h1 class="text-white">Login</h1>
+        <form id="loginForm" data-form  class="m-0" action="" method="post">
+            <div class="row mb-3">
+                <label for="loginUsername" class="col-sm-2 col-form-label text-white">Username</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="loginUsername" name=username required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="loginPassword" class="col-sm-2 col-form-label text-white">Password</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="loginPassword" name=password required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-secondary">Login</button>
+        </form>
+    </div>
+</div>
 </body>
 
 </html>
