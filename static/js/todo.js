@@ -13,8 +13,9 @@ async function loadData() {
     todos.forEach(el => loadTodo(el))
 }
 
-function changeStatus(uuid) {
-    console.log("HAHAHAHAHAHAH")
+async function changeStatus(uuid) {
+    const resp = await axiosInstance.put("/todos/" + uuid)
+    loadTodo(resp.data)
 }
 
 function deleteTodo(uuid) {
@@ -38,7 +39,10 @@ function loadTodo(curTodo) {
     todoObject.appendChild(buttonDiv)
     let buttonChangeStatus = document.createElement('a')
 
-    buttonChangeStatus.addEventListener("click", () => changeStatus(curTodo.uuid))
+    buttonChangeStatus.addEventListener("click", () => {
+        changeStatus(curTodo.uuid)
+        buttonChangeStatus.parentElement.parentElement.remove() //Löscht das TodoObjekt
+    })
     if(curTodo.status) {
         buttonChangeStatus.className = "btn btn-warning ml-2"
         buttonChangeStatus.innerText = "Reaktivieren"
@@ -55,5 +59,6 @@ function loadTodo(curTodo) {
     buttonDiv.appendChild(buttonDelete)
 
 }
+
 
 loadData()
