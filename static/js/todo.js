@@ -54,11 +54,15 @@ function loadTodo(curTodo) {
     buttonDiv.appendChild(buttonChangeStatus)
     let buttonDelete = document.createElement('a')
     buttonDelete.className = "btn btn-danger ml-2"
-    buttonDelete.addEventListener("click", () => deleteTodo(curTodo.uuid))
+    buttonDelete.addEventListener("click", () => {
+        deleteTodo(curTodo.uuid)
+        buttonDelete.parentElement.parentElement.remove() //Löscht das TodoObjekt
+    })
     buttonDelete.innerText = "Löschen"
     buttonDiv.appendChild(buttonDelete)
 
 }
+
 
 
 loadData()
