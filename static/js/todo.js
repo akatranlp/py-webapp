@@ -1,15 +1,29 @@
 import {user, axiosInstance} from "./repo.js";
 
-const deleteButton = document.querySelector("[data-delete-button]");
-const changeStateButton = document.querySelector("[data-change-state-button]");
+
+const createButton = document.querySelector("[data-create-button]");
+const openCreateForm = document.querySelector("[data-open-create-form-button]");
+const closeCreateForm = document.querySelector("[data-close-create-form-button]");
+const createTitle = document.querySelector("[data-create-title]");
+const createDescription = document.querySelector("[data-create-description]");
+const createForm = document.querySelector("[data-create-form]");
 const activeContainer = document.querySelector("[data-active-container]");
 const finishedContainer = document.querySelector("[data-finished-container]");
+
+const createFormHTML = createForm;
+function init(){
+    openCreateForm.addEventListener("click", ()=>toggleCreateForm())
+    closeCreateForm.addEventListener("click", ()=>toggleCreateForm())
+    createButton.addEventListener("click", ()=>createTodo())
+    createForm.setAttribute("hidden", "NoValueNeeded")
+    loadData()
+}
 
 async function loadData() {
     //Wird beim Laden aufgerufen und gibt dem HTML alles, was wir brauchen
     const resp = await axiosInstance.get("/todos")
     const todos = resp.data
-    console.log(todos)
+
     todos.forEach(el => loadTodo(el))
 }
 
@@ -21,7 +35,24 @@ async function changeStatus(uuid) {
 async function deleteTodo(uuid) {
     await axiosInstance.delete("/todos/" + uuid)
 }
+function toggleCreateForm(){
+    const cur = createForm.getAttribute("hidden")
+    if(cur) {
+        createForm.removeAttribute("hidden")
+        openCreateForm.setAttribute("hidden", "Bananenbrot")
+    } else {
+        createForm.setAttribute("hidden", "NoValueNeeded")
+        openCreateForm.removeAttribute("hidden")
+    }
 
+}
+async function createTodo(){
+    const resp = await axiosInstance.post("/todos", { //Laut https://axios-http.com/docs/post_example die struktur
+        title: createTitle,
+        description: createDescription
+    })
+    loadTodo(resp)
+}
 //Lädt die Todos
 function loadTodo(curTodo) {
     let todoObject
@@ -65,4 +96,4 @@ function loadTodo(curTodo) {
 
 
 
-loadData()
+init()
