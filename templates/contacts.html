@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User List</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', path='/js/contacts.js') }}" type="module"></script>
+    <script src="{{ url_for('static', path='/js/repo.js') }}" type="module"></script>
+</head>
+<body>
+<!-- Navigationsleiste -->
+<nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
+    <!-- Startseite & Logindaten -->
+    <div class="row pl-3">
+        <a class="loggedIn btn btn-light mr-sm-2" href="threadServlet">Startseite</a>
+        <a class="loggedIn btn btn-danger mr-sm-2" href="loginServlet">Ausloggen</a>
+        <div>
+            <p class="loggedIn text-white text-justify m-2 mr-4">Eingeloggt als: <b class="text-white"></b>
+            </p>
+        </div>
+    </div>
+    <!-- Mittlere Knöpfe: Kategorien & Userliste [Admin Knopf] -->
+    <div>
+        <a class="btn btn-secondary mr-sm-2" href="createThreadServlet">Thread erstellen</a>
+        <a class="btn btn-warning mr-sm-2" href="categoryServlet">Kategorien</a>
+    </div>
+    <!-- Suchleiste -->
+    <div>
+        <form class="form-inline m-0" method="get" action="threadServlet">
+            <label for="searchrequest"></label>
+            <input class="form-control mr-sm-2" type="search" id="searchrequest" name="searchrequest"
+                   placeholder="Suche" required/>
+            <input class="btn btn-primary mr-sm-2" type="submit" value="Suchen"/>
+        </form>
+    </div>
+</nav>
+
+
+<div class="container mt-5">
+    <div class="row pt-5">
+        <h1>Adressbuch</h1>
+    </div>
+    <div>
+        <form id="addContact" data-form class="bg-primary row g-3 m-1 p-2 border border-primary rounded" action="" method="post">
+            <div class="col-md-6 mb-1">
+                <input type="text" class="form-control" placeholder="Nachname" id="name" name=name required>
+            </div>
+            <div class="col-md-6 mb-1">
+                <input type="text" class="form-control" placeholder="Vorname" id="firstname" name=firstname required>
+            </div>
+            <div class="col-md-10 mb-1">
+                <input type="email" class="form-control" placeholder="Email" id="email" name=email required>
+            </div>
+            <div class="col-md-2 d-flex justify-content-end mb-1">
+                <button type="submit" class="btn btn-secondary" id="botton" name=button>Kontakt erstellen</button>
+            </div>
+        </form>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Username</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody data-table id="userList">
+
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
