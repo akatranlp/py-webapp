@@ -18,8 +18,8 @@ async function changeStatus(uuid) {
     loadTodo(resp.data)
 }
 
-function deleteTodo(uuid) {
-
+async function deleteTodo(uuid) {
+    await axiosInstance.delete("/todos/" + uuid)
 }
 
 //Lädt die Todos
