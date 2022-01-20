@@ -37,27 +37,8 @@
         <!-- Gedacht später als Knöpfe zu dienen, um zwischen un-/fertig zu wechseln -->
         <h2 class="col text-center">Erledigt</h2>
         <div class="w-100"></div> <!-- Trenner -->
-        <div active-container class="col">
-            <div class="p-2 border border-info rounded highlight">
-                <h2>TODO TITLE</h2>
-                <p>TODO DESCRIPTION</p>
-                <div class="d-flex justify-content-end">
-                    <a class="btn btn-success ml-2" onclick="changeStatus(aaa)" href="javascript:void(0)">Erledigt</a>
-                    <a class="btn btn-danger ml-2" href="">Löschen</a>
-                </div>
-            </div>
-        </div>
-        <div data-finished-container class="col">
-            <div class="p-2 border border-info rounded highlight">
-                <h2>TODO TITLE</h2>
-                <p>TODO DESCRIPTION</p>
-                <div class="d-flex justify-content-end">
-                    <a class="btn btn-warning ml-2" href="">Nicht Erledigt</a>
-                    <a class="btn btn-danger ml-2" href="">Löschen</a>
-                </div>
-            </div>
-        </div>
-    </div>
+        <div data-active-container class="col"></div>
+        <div data-finished-container class="col"></div>
 </div>
 </body>
 </html>
