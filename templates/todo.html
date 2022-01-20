@@ -29,19 +29,40 @@
 <!-- Seiteninhalt -->
 
 <div class="container mt-5">
-    <div class="justify-content-center">
-        <div class="col-auto">
-            <table class="table" width="100%">
-                <tr>
-                    <th class="">ToDo</th> <!-- Gedacht später als Knöpfe zu dienen, um zwischen un-/fertig zu wechseln -->
-                    <th class="">Erledigt</th>
-                </tr>
-            </table>
-            <div class="column p-2 border border-info rounded highlight">
-                <p>Todo 1</p>
-            </div>
-        </div>
-    </div>
+    <h1>ToDo - Liste</h1>
+    <table class="table" width="100%">
+        <tr>
+            <th class="">Zu erledigen</th>
+            <!-- Gedacht später als Knöpfe zu dienen, um zwischen un-/fertig zu wechseln -->
+            <th class="">Erledigt</th>
+        </tr>
+        <tr>
+            <td id="active-todo">
+                <div class="col-xs-6">
+                    <div class="column p-2 border border-info rounded highlight">
+                        <h2>TODO TITLE</h2>
+                        <p>TODO DESCRIPTION</p>
+                        <div class="d-flex justify-content-end">
+                            <a class="btn btn-success ml-2" href="">Erledigt</a>
+                            <a class="btn btn-danger ml-2" href="">Löschen</a>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td id="finished-todo">
+                <div class="col-xs-6">
+                    <div class="column p-2 border border-info rounded highlight">
+                        <h2>TODO TITLE</h2>
+                        <p>TODO DESCRIPTION</p>
+                        <div class="d-flex justify-content-end">
+                            <a class="btn btn-warning ml-2" href="">Nicht Erledigt</a>
+                            <a class="btn btn-danger ml-2" href="">Löschen</a>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 </div>
 </body>
 </html>
