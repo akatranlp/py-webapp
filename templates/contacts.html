@@ -20,15 +20,18 @@
         <h1>Adressbuch</h1>
     </div>
     <div>
-        <form id="addContact" data-form class="bg-primary row g-3 m-1 p-2 border border-primary rounded" action="" method="post">
+        <div data-alert hidden="" class="alert alert-danger p-1"></div>
+        <hr>
+        <form hidden="" id="addContact" data-form class="bg-primary row g-3 m-1 p-2 border border-primary rounded" action=""
+              method="post">
             <div class="col-md-6 mb-1">
-                <input type="text" class="form-control" placeholder="Nachname" id="name" name=name required>
+                <input data-name type="text" class="form-control" placeholder="Nachname" id="name" name=name required>
             </div>
             <div class="col-md-6 mb-1">
-                <input type="text" class="form-control" placeholder="Vorname" id="firstname" name=firstname required>
+                <input data-firstname type="text" class="form-control" placeholder="Vorname" id="firstname" name=firstname required>
             </div>
             <div class="col-md-10 mb-1">
-                <input type="email" class="form-control" placeholder="Email" id="email" name=email required>
+                <input data-email type="email" class="form-control" placeholder="Email" id="email" name=email required>
             </div>
             <div class="col-md-2 d-flex justify-content-end mb-1">
                 <button type="submit" class="btn btn-secondary" id="botton" name=button>Kontakt erstellen</button>
