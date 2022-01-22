@@ -49,7 +49,7 @@ async function createTodo(){
         title: createTitle.value,
         description: createDescription.value
     })
-    loadTodo(resp)
+    loadTodo(resp.data)
 }
 //Lädt die Todos
 function loadTodo(curTodo) {
