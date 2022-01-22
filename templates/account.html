@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ToDo-Liste</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', path='/js/repo.js') }}" type="module"></script>
+    <script src="{{ url_for('static', path='/js/account.js') }}" type="module"></script>
+</head>
+<body>
+<!-- Navigationsleiste -->
+<nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
+    <!-- Logindaten -->
+    <div class="row pl-3">
+        <a class="loggedIn btn btn-danger mr-sm-2" href="login.html">Ausloggen</a>
+        <div>
+            <p class="loggedIn text-white text-justify m-2 mr-4">Eingeloggt als: <b data-user-currentLoggedInUser class="text-white"
+                                                                                    id="loggedUser"></b>
+            </p>
+        </div>
+    </div>
+    <!-- Kalender und Adressbuch -->
+    <div>
+        <a class="btn btn-success mr-sm-2" href="calender.html">Kalender</a>
+        <a class="btn btn-warning mr-sm-2" href="contacts.html">Adressbuch</a>
+    </div>
+</nav>
+
+<!-- Seiteninhalt -->
+
+<div class="container mt-5">
+    <h1>Accounteinstellungen</h1>
+    <hr>
+    <h2>Account löschen</h2>
+    <div class="d-flex justify-content-between">
+        <a data-delete-user-button class="btn btn-danger mt-1">Account löschen</a>
+
+    </div>
+</div>
+</body>
+</html>
