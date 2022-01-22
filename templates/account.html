@@ -14,9 +14,10 @@
 <nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
     <!-- Logindaten -->
     <div class="row pl-3">
-        <a class="loggedIn btn btn-danger mr-sm-2" href="login.html">Ausloggen</a>
+        <a data-logout-button class="loggedIn btn btn-danger mr-sm-2" href="login.html">Ausloggen</a>
         <div>
-            <p class="loggedIn text-white text-justify m-2 mr-4">Eingeloggt als: <b data-user-currentLoggedInUser class="text-white"
+            <p class="loggedIn text-white text-justify m-2 mr-4">Eingeloggt als: <b data-user-currentLoggedInUser
+                                                                                    class="text-white"
                                                                                     id="loggedUser"></b>
             </p>
         </div>
@@ -33,10 +34,25 @@
 <div class="container mt-5">
     <h1>Accounteinstellungen</h1>
     <hr>
+    <h2>Passwort ändern</h2>
+    <div data-password-alert hidden="" class="alert alert-success p-1">
+            This is a primary alert—check it out!
+    </div>
+    <div class="row">
+        <label class="col m-0 mt-1">Altes Passwort</label>
+        <label class="col m-0 mt-1">Neues Passwort</label>
+
+        <div class="w-100"></div>
+        <input data-old-password class="col form-control m-1">
+        <input data-new-password class="col form-control m-1">
+    </div>
+    <div class="d-flex justify-content-end">
+        <a data-change-password-button class="btn btn-info mt-1">Passwort ändern</a>
+    </div>
+    <hr>
     <h2>Account löschen</h2>
     <div class="d-flex justify-content-between">
         <a data-delete-user-button class="btn btn-danger mt-1">Account löschen</a>
-
     </div>
 </div>
 </body>
