@@ -1,3 +1,9 @@
+const logoutButton = document.querySelector("[data-logout-button]");
+
+const init = ()=>{
+    logoutButton.addEventListener("click", () => window.location.replace("/logout/"))
+}
+
 class UserData {
     constructor(token) {
         this.token = token
@@ -50,3 +56,5 @@ axiosInstance.interceptors.request.use(async req => {
     req.headers.Authorization = `Bearer ${user?.token}`
     return req
 });
+
+init()
