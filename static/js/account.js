@@ -5,7 +5,9 @@ const oldPassword = document.querySelector("[data-old-password]");
 const newPassword = document.querySelector("[data-new-password]");
 const passwordAlert = document.querySelector("[data-password-alert]");
 
+
 const deleteButton = document.querySelector("[data-delete-user-button]");
+const deleteUserAlert = document.querySelector("[data-delete-user-alert]");
 
 const userText = document.querySelector("[data-user-currentLoggedInUser]");
 const currentUser = await user.getMe()
@@ -29,18 +31,29 @@ async function changePassword() {
     } catch (e) {
         passwordAlert.className = "alert alert-danger p-1"
         switch (e.response.status) {
-            case 401: //ggf. responsecode bei falschem altpasswort von 401 zu etwas anderes ändern
-                passwordAlert.innerText = "Fehler beim ändern des Passwortes: Das eingegebene alte Passwort ist falsch"
+            case 401:
+                if(e.response.data.detail === "False old password")
+                    passwordAlert.innerText = "Fehler: Das eingegebene alte Passwort ist falsch"
+                else
+                    passwordAlert.innerText = "Fehler: Du hast keine Rechte das Passwort zu ändern"
                 break;
             default:
-                passwordAlert.innerText = "Es ist ein unerwarteter Fehler aufgetreten: "+e.response.status
+                passwordAlert.innerText = "Es ist ein unerwarteter Fehler aufgetreten: "+e.response.status+" - "+e.response.statusText
         }
     }
     passwordAlert.removeAttribute("hidden")
 }
 
 async function deleteUser() {
-    await axiosInstance.delete("/users/" + currentUser.username)
+    try {
+        await axiosInstance.delete("/users/" + currentUser.username)
+        window.location.replace("/login")
+    }catch (e) {
+        deleteUserAlert.className = "alert alert-danger p-1"
+        deleteUserAlert.innerText = "Fehler beim Löschen des Accounts: "+e.response.status+" - "+e.response.statusText
+        deleteUserAlert.removeAttribute("hidden")
+    }
+
 }
 
 init()
