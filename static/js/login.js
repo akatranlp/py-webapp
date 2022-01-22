@@ -1,5 +1,5 @@
 const formElement = document.querySelector("[data-form]")
-
+const errorAlert = document.querySelector("[data-alert]");
 
 formElement.addEventListener("submit", async(e) => {
     e.preventDefault()
@@ -7,16 +7,28 @@ formElement.addEventListener("submit", async(e) => {
     const data = new URLSearchParams(new FormData(formElement))
     try {
         const response = await fetch("/login", {method: "post", body: data})
+        const jsonData = await response.json()
         if (response.status === 200) {
             window.location = "/"
+        } else if (response.status === 401){
+            openErrorAlert("Passwort ist falsch: " + response.status + " - " + jsonData.detail, null)
         } else {
-            const jsonData = await response.json()
-            alert(jsonData.detail + " " + response.status)
+            openErrorAlert("Username ist falsch: " + response.status + " - " + jsonData.detail, null)
         }
     } catch (error) {
-        alert("Fehler")
+        openErrorAlert("Es ist ein Fehler aufgetreten", null)
     }
 })
+
+const openErrorAlert = (text, e) => {
+    errorAlert.className = "alert alert-danger p-1"
+    if (e !== null) {
+        errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
+    }else {
+        errorAlert.innerText = text
+    }
+    errorAlert.removeAttribute("hidden")
+}
 
 const checkLogin = async () => {
     try {

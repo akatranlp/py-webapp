@@ -1,8 +1,9 @@
 const formElement = document.querySelector("[data-form]")
-const usernameElement = document.getElementById("registerUsername")
-const emailElement = document.getElementById("registerEmail")
-const passwordElement = document.getElementById("registerPassword")
-const password2Element = document.getElementById("registerPassword2")
+const errorAlert = document.querySelector("[data-alert]");
+const usernameElement = document.querySelector("[data-username]")
+const emailElement = document.querySelector("[data-email]")
+const passwordElement = document.querySelector("[data-password]")
+const password2Element = document.querySelector("[data-password2]")
 
 
 formElement.addEventListener("submit", async (e) => {
@@ -16,13 +17,22 @@ formElement.addEventListener("submit", async (e) => {
             const response = await axios.post("/users", {username, password_hash, email})
             window.location = "/login"
         } catch (error) {
-            const data = error.response.data
-            alert(data.detail + " " + error.response.status)
+            openErrorAlert(error.response.data.detail, error)
         }
     } else {
-        alert("Passwörter stimmen nicht überein")
+        openErrorAlert("Passwörter stimmen nicht überein", null)
     }
 })
+
+const openErrorAlert = (text, e) => {
+    errorAlert.className = "alert alert-danger p-1"
+    if (e !== null) {
+        errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
+    }else {
+        errorAlert.innerText = text
+    }
+    errorAlert.removeAttribute("hidden")
+}
 
 const checkLogin = async () => {
     try {
