@@ -10,10 +10,7 @@ function init(){
     deleteButton.addEventListener("click", ()=>deleteUser())
 }
 
-async function changePassword() {
-}
-
 async function deleteUser(uuid) {
-    await axiosInstance.delete("/users/"+currentUser)
+    await axiosInstance.delete("/users/"+currentUser.username)
 }
 init()
