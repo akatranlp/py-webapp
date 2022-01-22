@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <title>Hallo Welt</title>
     <link href="{{ url_for('static', path='/css/index.css') }}" rel="stylesheet">
-    <script src="{{ url_for('static', path='/js/index.js') }}"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', path='/js/index.js') }}" defer></script>
 </head>
 <body>
+<nav><div data-me></div></nav>
 <h1>Hallo Welt!!!</h1>
 </body>
 </html>
