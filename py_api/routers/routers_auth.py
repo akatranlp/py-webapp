@@ -17,7 +17,7 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
 
 @router.get('/logout')
 async def logout() -> RedirectResponse:
-    response = RedirectResponse(url='/')
+    response = RedirectResponse(url='/login')
     repos_auth.logout(response)
     return response
 
