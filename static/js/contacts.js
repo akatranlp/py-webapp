@@ -2,10 +2,11 @@ import {axiosInstance} from "./repo.js";
 
 const tableElement = document.querySelector("[data-table]")
 const formElement = document.querySelector("[data-form]")
-const logoutButton = document.getElementById("logout")
-const nameElement = document.getElementById("name")
-const firstnameElement = document.getElementById("firstname")
-const emailElement = document.getElementById("email")
+const errorAlert = document.querySelector("[data-alert]");
+const logoutButton = document.querySelector("[data-logout-button]")
+const nameElement = document.querySelector("[data-name]")
+const firstnameElement = document.querySelector("[data-firstname]")
+const emailElement = document.querySelector("[data-email]")
 
 logoutButton.addEventListener("click", async (e) => {
     window.location = "/logout"
@@ -16,13 +17,13 @@ formElement.addEventListener("submit", async (e) => {
     const name = nameElement.value
     const firstname = firstnameElement.value
     const email = emailElement.value
+
     try {
         const response = await axiosInstance.post("/contacts", {name, firstname, email})
         console.log(response)
         window.location = "/contact"
     } catch (error) {
-        const data = error.response.data
-        alert(data.detail + " " + error.response.status)
+        openErrorAlert(error.response.data.detail, error)
     }
 })
 
@@ -48,7 +49,7 @@ const loadData = async () => {
                     await axiosInstance.delete("/contacts/" + element.uuid)
                     window.location = "/contact"
                 } catch (error) {
-
+                    openErrorAlert(error.response.data.detail, error)
                 }
             })
 
@@ -59,8 +60,18 @@ const loadData = async () => {
             tableElement.appendChild(deleteButton)
         })
     } catch (error) {
-
+        openErrorAlert("Fehler beim laden der Daten", error)
     }
+}
+
+const openErrorAlert = (text, e) => {
+    errorAlert.className = "alert alert-danger p-1"
+    if (e !== null) {
+        errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
+    } else {
+        errorAlert.innerText = text
+    }
+    errorAlert.removeAttribute("hidden")
 }
 
 loadData()
