@@ -3,14 +3,9 @@ import {axiosInstance} from "./repo.js";
 const tableElement = document.querySelector("[data-table]")
 const formElement = document.querySelector("[data-form]")
 const errorAlert = document.querySelector("[data-alert]");
-const logoutButton = document.querySelector("[data-logout-button]")
 const nameElement = document.querySelector("[data-name]")
 const firstnameElement = document.querySelector("[data-firstname]")
 const emailElement = document.querySelector("[data-email]")
-
-logoutButton.addEventListener("click", async (e) => {
-    window.location = "/logout"
-})
 
 formElement.addEventListener("submit", async (e) => {
     e.preventDefault()
