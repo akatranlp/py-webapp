@@ -51,3 +51,12 @@ async def delete_todo(uuid: UUID, user: models_user.User):
     todo = await schemas_todo.TodoOut.from_tortoise_orm(todo_obj)
     await todo_obj.delete()
     return todo
+
+
+# Ein _Todo-Status ändern
+async def change_status_todo(uuid: UUID, user: models_user.User):
+    todo_obj = await _get_todo(uuid, user)
+    todo_obj.status = False if todo_obj.status else True # Invertiert den Status
+    await todo_obj.save()
+    return await schemas_todo.TodoOut.from_tortoise_orm(todo_obj)
+

@@ -48,3 +48,11 @@ async def delete_todo(uuid: UUID,
                       user: models_user.User =
                       Depends(oauth2.get_current_active_user_model)) -> schemas_todo.TodoOut:
     return await repos_todo.delete_todo(uuid, user)
+
+
+# Status des ToDos ändern
+@router.put('/{uuid}', response_model=schemas_todo.TodoOut)
+async def change_status_todo(uuid: UUID,
+                             user: models_user.User =
+                             Depends(oauth2.get_current_active_user_model)) -> schemas_todo.TodoOut:
+    return await repos_todo.change_status_todo(uuid, user)
