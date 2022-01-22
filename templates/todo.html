@@ -10,26 +10,10 @@
     <script src="{{ url_for('static', path='/js/todo.js') }}" type="module"></script>
 </head>
 <body>
-<!-- Navigationsleiste -->
-<nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
-    <!-- Logindaten -->
-    <div class="row pl-3">
-        <a data-logout-button class="loggedIn btn btn-danger mr-sm-2">Ausloggen</a>
-        <div>
-            <p class="loggedIn text-white text-justify m-2 mr-4">Eingeloggt als: <b data-user-currentLoggedInUser class="text-white"
-                                                                                    id="loggedUser"></b>
-            </p>
-        </div>
-    </div>
-    <!-- Kalender und Adressbuch -->
-    <div>
-        <a class="btn btn-success mr-sm-2" href="calender.html">Kalender</a>
-        <a class="btn btn-warning mr-sm-2" href="contacts.html">Adressbuch</a>
-    </div>
-</nav>
+<!-- Navigationsleiste, wird über repo.js gefüllt. -->
+<nav data-navbar class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20"></nav>
 
 <!-- Seiteninhalt -->
-
 <div class="container mt-5">
     <h1>ToDo - Liste</h1>
     <div data-alert hidden="" class="alert alert-danger p-1"></div>

@@ -12,33 +12,8 @@
     <script src="{{ url_for('static', path='/js/repo.js') }}" type="module"></script>
 </head>
 <body>
-<!-- Navigationsleiste -->
-<nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
-    <!-- Startseite & Logindaten -->
-    <div class="row pl-3">
-        <a class="loggedIn btn btn-light mr-sm-2" href="threadServlet">Startseite</a>
-        <a data-logout-button class="loggedIn btn btn-danger mr-sm-2">Ausloggen</a>
-        <div>
-            <p class="loggedIn text-white text-justify m-2 mr-4">Eingeloggt als: <b class="text-white"></b>
-            </p>
-        </div>
-    </div>
-    <!-- Mittlere Knöpfe: Kategorien & Userliste [Admin Knopf] -->
-    <div>
-        <a class="btn btn-secondary mr-sm-2" href="createThreadServlet">Thread erstellen</a>
-        <a class="btn btn-warning mr-sm-2" href="categoryServlet">Kategorien</a>
-    </div>
-    <!-- Suchleiste -->
-    <div>
-        <form class="form-inline m-0" method="get" action="threadServlet">
-            <label for="searchrequest"></label>
-            <input class="form-control mr-sm-2" type="search" id="searchrequest" name="searchrequest"
-                   placeholder="Suche" required/>
-            <input class="btn btn-primary mr-sm-2" type="submit" value="Suchen"/>
-        </form>
-    </div>
-</nav>
-
+<!-- Navigationsleiste, wird über repo.js gefüllt. -->
+<nav data-navbar class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20"></nav>
 
 <div class="container mt-5">
     <div class="row pt-5">
