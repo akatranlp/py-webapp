@@ -1,6 +1,6 @@
 import {user, axiosInstance} from "./repo.js";
 
-
+const errorAlert = document.querySelector("[data-alert]");
 const createButton = document.querySelector("[data-create-button]");
 const openCreateForm = document.querySelector("[data-open-create-form-button]");
 const closeCreateForm = document.querySelector("[data-close-create-form-button]");
@@ -10,48 +10,55 @@ const createForm = document.querySelector("[data-create-form]");
 const activeContainer = document.querySelector("[data-active-container]");
 const finishedContainer = document.querySelector("[data-finished-container]");
 
-function init(){
-    openCreateForm.addEventListener("click", ()=>toggleCreateForm())
-    closeCreateForm.addEventListener("click", ()=>toggleCreateForm())
-    createButton.addEventListener("click", ()=>createTodo())
+function init() {
+    openCreateForm.addEventListener("click", () => toggleCreateForm())
+    closeCreateForm.addEventListener("click", () => toggleCreateForm())
+    createButton.addEventListener("click", () => createTodo())
     loadData()
 }
 
 async function loadData() {
-    //Wird beim Laden aufgerufen und gibt dem HTML alles, was wir brauchen
-    const resp = await axiosInstance.get("/todos")
-    const todos = resp.data
-
-    todos.forEach(el => loadTodo(el))
+    //Wird beim Laden aufgerufen und gibt dem HTML alle Todos
+    try {
+        const resp = await axiosInstance.get("/todos")
+        const todos = resp.data
+        todos.forEach(el => loadTodo(el))
+    } catch (e) {
+        openErrorAlert("Fehler beim laden der Todos",e)
+    }
 }
 
 async function changeStatus(uuid) {
-    const resp = await axiosInstance.put("/todos/" + uuid)
-    loadTodo(resp.data)
+    try {
+        const resp = await axiosInstance.put("/todos/" + uuid)
+        loadTodo(resp.data)
+    } catch (e) {
+        openErrorAlert("Fehler beim ändern des Todo-Status",e)
+    }
 }
 
 async function deleteTodo(uuid) {
-    await axiosInstance.delete("/todos/" + uuid)
-}
-function toggleCreateForm(){
-    const cur = createForm.getAttribute("hidden")
-    if(cur) {
-        createForm.removeAttribute("hidden")
-        openCreateForm.setAttribute("hidden", "Bananenbrot")
-    } else {
-        createForm.setAttribute("hidden", "NoValueNeeded")
-        openCreateForm.removeAttribute("hidden")
+    try {
+        await axiosInstance.delete("/todos/" + uuid)
+    }catch(e){
+        openErrorAlert("Fehler beim ändern des Passworts",e)
     }
+}
 
+async function createTodo() {
+    try {
+        const resp = await axiosInstance.post("/todos", { //Laut https://axios-http.com/docs/post_example die struktur
+            title: createTitle.value,
+            description: createDescription.value
+        })
+        loadTodo(resp.data)
+    }catch (e) {
+        openErrorAlert("Fehler beim erstellen des Todos",e)
+    }
 }
-async function createTodo(){
-    const resp = await axiosInstance.post("/todos", { //Laut https://axios-http.com/docs/post_example die struktur
-        title: createTitle.value,
-        description: createDescription.value
-    })
-    loadTodo(resp.data)
-}
-//Lädt die Todos
+
+//---- Normale Funktionen ----//
+//Lädt das To-Do 'curTodo'
 function loadTodo(curTodo) {
     let todoObject
     todoObject = document.createElement('div')
@@ -72,11 +79,10 @@ function loadTodo(curTodo) {
         changeStatus(curTodo.uuid)
         buttonChangeStatus.parentElement.parentElement.remove() //Löscht das TodoObjekt
     })
-    if(curTodo.status) {
+    if (curTodo.status) {
         buttonChangeStatus.className = "btn btn-warning ml-2"
         buttonChangeStatus.innerText = "Reaktivieren"
-    }
-    else{
+    } else {
         buttonChangeStatus.className = "btn btn-success ml-2"
         buttonChangeStatus.innerText = "Erledigt"
     }
@@ -89,9 +95,23 @@ function loadTodo(curTodo) {
     })
     buttonDelete.innerText = "Löschen"
     buttonDiv.appendChild(buttonDelete)
-
 }
 
+function toggleCreateForm() {
+    const cur = createForm.getAttribute("hidden")
+    if (cur) {
+        createForm.removeAttribute("hidden")
+        openCreateForm.setAttribute("hidden", "Bananenbrot")
+    } else {
+        createForm.setAttribute("hidden", "NoValueNeeded")
+        openCreateForm.removeAttribute("hidden")
+    }
+}
 
-
+function openErrorAlert(text,e) {
+    errorAlert.className = "alert alert-danger p-1"
+    errorAlert.innerText = text+": "+e.response.status+" - "+e.response.statusText
+    errorAlert.removeAttribute("hidden")
+}
+//Aufruf von Init
 init()
