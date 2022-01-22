@@ -32,6 +32,23 @@
 
 <div class="container mt-5">
     <h1>ToDo - Liste</h1>
+    <hr>
+    <a data-open-create-form-button class="btn btn-success m-1">Neues ToDo erstellen</a>
+    <div hidden="Bananenbrot" data-create-form class="p-2 border border-success rounded highlight mb-1">
+        <form> <!-- Daten werden nicht über Form gesendet, da wir da probleme mit axios haben-->
+
+            <label class="m-0 mt-"> Titel</label>
+            <input data-create-title class="form-control">
+
+            <label class="m-0 mt-1">Beschreibung</label>
+            <textarea data-create-description class="form-control"></textarea>
+            <div class="d-flex justify-content-between">
+                <a data-close-create-form-button class="btn btn-warning mt-1">Schließen</a>
+                <a data-create-button class="btn btn-success mt-1">Neues ToDo erstellen</a></div>
+        </form>
+
+    </div>
+    <hr>
     <div class=row>
         <h2 class="col text-center">Zu erledigen</h2>
         <!-- Gedacht später als Knöpfe zu dienen, um zwischen un-/fertig zu wechseln -->
@@ -39,6 +56,6 @@
         <div class="w-100"></div> <!-- Trenner -->
         <div data-active-container class="col"></div>
         <div data-finished-container class="col"></div>
-</div>
+    </div>
 </body>
 </html>
