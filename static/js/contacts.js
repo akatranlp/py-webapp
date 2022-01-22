@@ -8,12 +8,7 @@ const firstnameElement = document.getElementById("firstname")
 const emailElement = document.getElementById("email")
 
 logoutButton.addEventListener("click", async (e) => {
-    try {
-        await axiosInstance.get("/logout")
-        window.location = "/login"
-    } catch (error) {
-
-    }
+    window.location = "/logout"
 })
 
 formElement.addEventListener("submit", async (e) => {
