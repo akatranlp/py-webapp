@@ -1,4 +1,4 @@
-import {user, axiosInstance} from "./repo.js";
+import {axiosInstance} from "./repo.js";
 
 const tableElement = document.querySelector("[data-table]")
 const formElement = document.querySelector("[data-form]")
@@ -8,9 +8,9 @@ const firstnameElement = document.getElementById("firstname")
 const emailElement = document.getElementById("email")
 
 logoutButton.addEventListener("click", async (e) => {
-    console.log("SSSSSSSSSSS")
     try {
         await axiosInstance.get("/logout")
+        window.location = "/login"
     } catch (error) {
 
     }
@@ -33,12 +33,35 @@ formElement.addEventListener("submit", async (e) => {
 
 const loadData = async () => {
     try {
-        const contacts = await axiosInstance.get("/contacts")
-
+        const response = await axiosInstance.get("/contacts")
+        const contacts = response.data
+        console.log(contacts)
         contacts.forEach(element => {
-            const contact = document.createElement("td")
-            contact.innerHTML = element.name
-            tableElement.appendChild(contact)
+            const row = document.createElement("tr")
+            const contactName = document.createElement("td")
+            contactName.innerHTML = element.name
+            const contactFirstname = document.createElement("td")
+            contactFirstname.innerHTML = element.firstname
+            const contactEmail = document.createElement("td")
+            contactEmail.innerHTML = element.email
+
+            const deleteButton = document.createElement("button")
+            deleteButton.innerHTML = "Nutzer entfernen"
+            deleteButton.className = "btn btn-danger mr-sm-2"
+            deleteButton.addEventListener("click", async (event) => {
+                try {
+                    await axiosInstance.delete("/contacts/" + element.uuid)
+                    window.location = "/contact"
+                } catch (error) {
+
+                }
+            })
+
+            tableElement.appendChild(row)
+            tableElement.appendChild(contactName)
+            tableElement.appendChild(contactFirstname)
+            tableElement.appendChild(contactEmail)
+            tableElement.appendChild(deleteButton)
         })
     } catch (error) {
 
