@@ -34,14 +34,14 @@
     <h1>ToDo - Liste</h1>
     <hr>
     <a data-open-create-form-button class="btn btn-success m-1">Neues ToDo erstellen</a>
-    <div data-create-form class="p-2 border border-success rounded highlight mb-1">
-        <form>
+    <div hidden data-create-form class="p-2 border border-success rounded highlight mb-1">
+        <form> <!-- Daten werden nicht über Form gesendet, da wir da probleme mit axios haben-->
 
             <label class="m-0 mt-"> Titel</label>
-            <input class="form-control">
+            <input data-create-title class="form-control">
 
             <label class="m-0 mt-1">Beschreibung</label>
-            <textarea class="form-control"></textarea>
+            <textarea data-create-description class="form-control"></textarea>
             <div class="d-flex justify-content-between">
                 <a data-close-create-form-button class="btn btn-warning mt-1">Schließen</a>
                 <a data-create-button class="btn btn-success mt-1">Neues ToDo erstellen</a></div>

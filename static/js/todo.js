@@ -10,12 +10,10 @@ const createForm = document.querySelector("[data-create-form]");
 const activeContainer = document.querySelector("[data-active-container]");
 const finishedContainer = document.querySelector("[data-finished-container]");
 
-const createFormHTML = createForm;
 function init(){
     openCreateForm.addEventListener("click", ()=>toggleCreateForm())
     closeCreateForm.addEventListener("click", ()=>toggleCreateForm())
     createButton.addEventListener("click", ()=>createTodo())
-    createForm.setAttribute("hidden", "NoValueNeeded")
     loadData()
 }
 
@@ -48,8 +46,8 @@ function toggleCreateForm(){
 }
 async function createTodo(){
     const resp = await axiosInstance.post("/todos", { //Laut https://axios-http.com/docs/post_example die struktur
-        title: createTitle,
-        description: createDescription
+        title: createTitle.value,
+        description: createDescription.value
     })
     loadTodo(resp)
 }
