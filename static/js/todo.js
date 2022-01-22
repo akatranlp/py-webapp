@@ -10,11 +10,7 @@ const createForm = document.querySelector("[data-create-form]");
 const activeContainer = document.querySelector("[data-active-container]");
 const finishedContainer = document.querySelector("[data-finished-container]");
 
-const userText = document.querySelector("[data-user-currentLoggedInUser]");
-const currentUser = await user.getMe()
-
 function init() {
-    userText.innerText = currentUser.username
     openCreateForm.addEventListener("click", () => toggleCreateForm())
     closeCreateForm.addEventListener("click", () => toggleCreateForm())
     createButton.addEventListener("click", () => createTodo())
