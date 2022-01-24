@@ -18,6 +18,9 @@ async def get_index(request: Request):
 async def get_login(request: Request):
     return templates.TemplateResponse('login.html', {'request': request})
 
+@router.get('/calendar', response_class=HTMLResponse, include_in_schema=False)
+async def get_login(request: Request):
+    return templates.TemplateResponse('calender.html', {'request': request})
 
 @router.get('/register', response_class=HTMLResponse, include_in_schema=False)
 async def get_login(request: Request):

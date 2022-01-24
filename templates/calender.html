@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Calender</title>
+    <base href="/repo.js">
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet"
           href="/static/css/calender.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-
 </head>
+
 <body>
 <nav class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20">
     <!-- Startseite & Logindaten -->
@@ -24,7 +25,29 @@
         <div class="overflow-hidden w-25">
             <div class="overflow-hidden col border rounded p-2 container-sm bg-primary ">
                 <h1 class="text-white">stuff</h1>
-                <button class="btn btn-secondary" onclick="newMeeting()">Neuer Termin</button>
+                <button class="open-button" onclick="openForm()">Neuer Termin</button>
+                <div class="form-popup" id="myForm" style="display: none">
+                    <form action="" data-form method="post" class="form-container">
+                        <h1>Neuer Termin</h1>
+
+                        <label for="Titel"><b>Titel</b></label>
+                        <input type="text" name="title" id="Titel" required><br>
+
+                        <label for="Start"><b>Start Datum</b></label>
+                        <input type="datetime-local" name="start_date" id="Start" max="2100-01-01T00:00" required><br>
+
+                        <label for="Ende"><b>End Datum</b></label>
+                        <input type="datetime-local" name="end_date" id="Ende" max="2100-01-01T00:00" required><br>
+
+                        <label for="Beschreibung"><b>Beschreibung</b></label>
+                        <input type="text" name="description" id="Beschreibung"><br>
+
+                        <label for="Ort"><b>Ort</b></label>
+                        <input type="text" name="location" id="Ort"><br>
+
+                        <button type="submit" class="button">Erstellen</button>
+                    </form>
+                </div>
             </div>
         </div>
         <div class="overflow-auto w-75">
@@ -37,66 +60,7 @@
     </div>
 </div>
 
-<script>
-
-    window.onload = createCalender()
-
-    function f() {
-
-        var myJSON = '{"D":[' +
-            '{"terminName":"Essen","Date":[{"dateDay": 21 ,"dateMonth": 7 ,"dateYear": 2022, "dateHour": 16 ,"dateMinute": 55}], "terminID": 0},' +
-            '{"terminName":"Anderes Ding","Date":[{"dateDay": 25 ,"dateMonth": 7 ,"dateYear": 2022, "dateHour": 16 ,"dateMinute": 55}], "terminID": 0}' +
-            ']}'
-        const myObj = JSON.parse(myJSON)
-
-        return (myObj)
-    }
-
-    function deleteItem(ID) {
-        console.log(ID)
-    }
-
-    function createCalender() {
-        console.log(f().D)
-        var calenderEntries = document.createElement("div")
-        response = f().D
-
-        response.forEach(element => {
-
-            console.log(element)
-
-            document.getElementById("calenderContent").appendChild(calenderEntries)
-            var aItem = document.createElement('div');
-            aItem.classList.add('calenderCSS')
-
-            let btn = document.createElement("button")
-            btn.innerHTML = "Cancel"
-            btn.onclick = function () {
-                console.log("click")
-                calenderEntries.removeChild(aItem)
-                deleteItem(element.terminID)
-
-            }
-
-            var date = element.Date[0]
-
-            aItem.innerHTML = '' +
-                '  ' + date.dateDay + '.' + date.dateMonth + '.' + date.dateYear + '' +
-                '  ' + element.terminName + ' ' +
-                '  ' +
-                ''
-            calenderEntries.appendChild(aItem);
-
-            aItem.appendChild(btn);
-
-        });
-
-    }
-
-    function newMeeting() {
-
-    }
-</script>
+<script src="/static/js/calender.js" type="text/javascript" type="module"></script>
 
 </body>
 </html>
