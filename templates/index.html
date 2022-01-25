@@ -11,20 +11,21 @@
 </head>
 <body>
 <nav data-nav-loggedIn class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20" hidden>
-    <div class="d-flex">
-        <div class="row pl-3">
-            <a class="loggedIn btn btn-danger mr-sm-2" href="/logout">Ausloggen</a>
-            <div>
-                <p class="loggedIn text-white text-justify m-2 mr-4">Eingeloggt als: <b class="text-white"
-                                                                                        data-me></b>
-                </p>
-            </div>
-        </div>
+    <!-- Logindaten -->
+    <div class="row pl-3">
+        <a class="btn btn-danger text-white mr-sm-2" href="/logout">Ausloggen</a>
+        <a class="btn btn-secondary text-white mr-sm-2" href="/account">Einstellungen</a>
         <div>
-            <a class="btn btn-success mr-sm-2" href="/calendar">Kalender</a>
-            <a class="btn btn-success mr-sm-2" href="/todo">Todos</a>
-            <a class="btn btn-warning mr-sm-2" href="/contact">Adressbuch</a>
+            <p class="text-white text-justify m-2 mr-4">Eingeloggt als:
+                <b class="text-white" data-me></b>
+            </p>
         </div>
+    </div>
+    <!-- Kalender und Adressbuch -->
+    <div>
+        <a class="btn btn-info mr-sm-2" href="/todo">ToDo-Liste</a>
+        <a class="btn btn-success text-white mr-sm-2" href="/calendar">Kalender</a>
+        <a class="btn btn-warning mr-sm-2" href="/contact">Adressbuch</a>
     </div>
 </nav>
 <nav data-nav-loggedOut class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20" hidden>

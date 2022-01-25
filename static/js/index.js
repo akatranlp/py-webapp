@@ -1,5 +1,5 @@
-const navLoggedInElement = document.querySelector("[data-nav-LoggedIn]");
-const navLoggedOutElement = document.querySelector("[data-nav-LoggedOut]");
+const navLoggedInElement = document.querySelector("[data-nav-loggedIn]");
+const navLoggedOutElement = document.querySelector("[data-nav-loggedOut]");
 const pluginsContainerElement = document.querySelector("[data-plugins-container]");
 
 let me;
