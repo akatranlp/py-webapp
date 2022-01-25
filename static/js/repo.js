@@ -70,7 +70,7 @@ const init = async () => {
         "    <!-- Kalender und Adressbuch -->\n" +
         "    <div>\n" +
         "        <a class=\"btn btn-info mr-sm-2\" onclick='window.location.replace(\"/todo/\")'>ToDo-Liste</a>\n" +
-        "        <a class=\"btn btn-success text-white mr-sm-2\" onclick='window.location.replace(\"/calender/\")'>Kalender</a>\n" +
+        "        <a class=\"btn btn-success text-white mr-sm-2\" onclick='window.location.replace(\"/calendar/\")'>Kalender</a>\n" +
         "        <a class=\"btn btn-warning mr-sm-2\" onclick='window.location.replace(\"/contact/\")'>Adressbuch</a>\n" +
         "    </div>"
 }
