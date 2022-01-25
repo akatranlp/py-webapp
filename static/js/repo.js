@@ -56,23 +56,24 @@ axiosInstance.interceptors.request.use(async req => {
 
 const init = async () => {
     const currentUser = await user.getMe()
-    navbar.innerHTML =
-        "<!-- Logindaten -->\n" +
-        "    <div class=\"row pl-3\">\n" +
-        "        <a class=\"btn btn-danger text-white mr-sm-2\" onclick='window.location.replace(\"/logout/\")'>Ausloggen</a>\n" +
-        "        <a class=\"btn btn-secondary text-white mr-sm-2\" onclick='window.location.replace(\"/account/\")'>Einstellungen</a>\n" +
-        "        " +
-        "<div>\n" +
-        "            <p class=\"text-white text-justify m-2 mr-4\">Eingeloggt als:\n" +
-        "                <b class=\"text-white\" id=\"loggedUser\">"+currentUser.username+"</b>\n" +
-        "            </p>\n" +
-        "        </div>\n" +
-        "    </div>\n" +
-        "    <!-- Kalender und Adressbuch -->\n" +
-        "    <div>\n" +
-        "        <a class=\"btn btn-info mr-sm-2\" onclick='window.location.replace(\"/todo/\")'>ToDo-Liste</a>\n" +
-        "        <a class=\"btn btn-success text-white mr-sm-2\" onclick='window.location.replace(\"/calendar/\")'>Kalender</a>\n" +
-        "        <a class=\"btn btn-warning mr-sm-2\" onclick='window.location.replace(\"/contact/\")'>Adressbuch</a>\n" +
-        "    </div>"
+    navbar.innerHTML = `
+    <!-- Logindaten -->
+    <div class="row pl-3">
+        <a class="btn btn-danger text-white mr-sm-2" onclick="window.location.replace('/logout')">Ausloggen</a>
+        <a class="btn btn-secondary text-white mr-sm-2" onclick="window.location.replace('/account')">Einstellungen</a>
+        <div>
+            <p class="text-white text-justify m-2 mr-4">Eingeloggt als:
+                <b class="text-white" id="loggedUser">${currentUser.username}</b>
+            </p>
+        </div>
+    </div>
+    <!-- Kalender und Adressbuch -->
+    <div>
+        <a class="btn btn-info mr-sm-2" onclick="window.location.replace('/todo')">ToDo-Liste</a>
+        <a class="btn btn-success text-white mr-sm-2" onclick="window.location.replace('/calendar')">Kalender</a>
+        <a class="btn btn-warning mr-sm-2" onclick="window.location.replace('/contact')">Adressbuch</a>
+    </div>
+    `
 }
+
 init()
