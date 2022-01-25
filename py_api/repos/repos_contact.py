@@ -22,14 +22,14 @@ async def create_contact(contact: schemas_contact.ContactIn, user: models_user.U
     try:
         await contact_obj.save()
     except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Hat nicht funktioniert')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Existiert bereits')
     return await schemas_contact.ContactOut.from_tortoise_orm(contact_obj)
 
 
 async def _get_contact(uuid: UUID, user: models_user.User):
     contact = await models_contact.Contact.get(uuid=uuid, creator=user)
     if not contact:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Contact does not exist')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Kontakt existiert nicht')
     return contact
 
 
