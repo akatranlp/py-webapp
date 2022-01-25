@@ -2,9 +2,6 @@ import {user, axiosInstance} from "./repo.js";
 
 const calenderDiv = document.getElementById("calenderContent")
 const formElement = document.querySelector("[data-form]")
-const btnOpenFormElement = document.querySelector("[data-btn-openform]")
-
-btnOpenFormElement.addEventListener('click', openForm)
 
 
 let openOrClosed = false
@@ -45,6 +42,7 @@ async function createCalender() {
 
         calenderDiv.appendChild(calenderEntries)
         var aItem = document.createElement('div');
+        aItem.className = "p-2 border border-success rounded highlight mb-1"
         aItem.classList.add('calenderCSS')
 
         let startDate = JSON.stringify(element.start_date)
@@ -66,37 +64,25 @@ async function createCalender() {
         let endMinute = splittetEnd[1].split(":")[1]
 
 
-        aItem.innerHTML = '' +
-            ' <h1> ' + element.title + '</h1> <br>' +
-            ' vom ' + startDay + '.' + startMonth + '.' + startYear + ' ' + startHour + ':' + startMinute + ' <br> ' +
-            ' bis ' + endDay + '.' + endMonth + '.' + endYear + ' ' + endHour + ':' + endMinute + '           <br>' +
-            '  ' +
-            ''
-        calenderEntries.appendChild(aItem);
+        aItem.innerHTML = `
+            <h1>${element.title}</h1> 
+            <p>${element.description}</p>
+            <p>Ort: ${element.location}</p>
+            <p><b>von</b> ${startDay}.${startMonth}.${startYear} - ${startHour}:${startMinute}<br>
+            <b>bis</b> ${endDay}.${endMonth}.${endYear} - ${endHour}:${endMinute}</p>`
 
+        calenderEntries.appendChild(aItem);
+        //Button zum Termin absagen hinzufügen
         let btn = document.createElement("button")
-        btn.innerHTML = "Cancel"
-        btn.onclick = function () {
-            console.log("click")
+        btn.className = "btn btn-danger mr-sm-2"
+        btn.innerText = "Termin absagen"
+        btn.addEventListener("click", () => {
             calenderEntries.removeChild(aItem)
             deleteItem(element.uuid)
-
-        }
-
+        })
         aItem.appendChild(btn);
-
     });
 
-}
-
-function openForm() {
-    if (!openOrClosed) {
-        document.getElementById("myForm").style.display = "block";
-        openOrClosed = true
-    } else {
-        document.getElementById("myForm").style.display = "none";
-        openOrClosed = false
-    }
 }
 
 formElement.addEventListener("submit", async (e) => {
