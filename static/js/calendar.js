@@ -1,38 +1,28 @@
-var calenderDiv = document.getElementById("calenderContent")
+import {user, axiosInstance} from "./repo.js";
+
+const calenderDiv = document.getElementById("calenderContent")
 const formElement = document.querySelector("[data-form]")
+const btnOpenFormElement = document.querySelector("[data-btn-openform]")
+
+btnOpenFormElement.addEventListener('click', openForm)
+
+
 let openOrClosed = false
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaXNfYWRtaW4iOnRydWUsIm5iZiI6MTY0MzA2NTQ0OCwiZXhwIjoxNjQzMDY2MzQ4fQ.3m0FcqK9EUtRWJOOutdUN6syOM7BrwgWE7Alpnwi8_I"
-
-window.onload = createCalender()
-
 
 async function f() {
 
-    const response = await fetch("/events", {
-        method: "get",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token + '  '
-        }
-    })
+    const response = await axiosInstance.get("/events")
 
-    const jsonData = await response.json()
+    const jsonData = response.data
 
     console.log(jsonData)
-    return (jsonData)
+    return jsonData
 }
 
 async function deleteItem(ID) {
     console.log(ID)
 
-    const response = await fetch("/events/" + ID, {
-        method: "delete",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token + '  '
-        }
-    })
-
+    const response = await axiosInstance.delete(`/events/${ID}`)
     console.log(response)
 }
 
@@ -100,7 +90,7 @@ async function createCalender() {
 }
 
 function openForm() {
-    if (openOrClosed == false) {
+    if (!openOrClosed) {
         document.getElementById("myForm").style.display = "block";
         openOrClosed = true
     } else {
@@ -121,23 +111,12 @@ formElement.addEventListener("submit", async (e) => {
     }
     console.log(data)
     try {
-        const response = await fetch("/events", {
-            method: "post",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token + '  '
-            },
-            body: JSON.stringify(data)
-        })
-        const jsonData = await response.json()
-        if (response.status === 200) {
-            location.reload()
-        } else {
-            console.log(jsonData.detail)
-        }
-    } catch (error) {
-        console.log(error)
+        const response = await axiosInstance.post("/events", data)
+        const jsonData = response.data
+        location.reload()
+    } catch (e) {
+        console.log(e.response.data.detail)
     }
 })
 
-
+createCalender()

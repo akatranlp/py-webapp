@@ -20,7 +20,7 @@ async def get_login(request: Request):
 
 @router.get('/calendar', response_class=HTMLResponse, include_in_schema=False)
 async def get_login(request: Request):
-    return templates.TemplateResponse('calender.html', {'request': request})
+    return templates.TemplateResponse('calendar.html', {'request': request})
 
 @router.get('/register', response_class=HTMLResponse, include_in_schema=False)
 async def get_login(request: Request):
