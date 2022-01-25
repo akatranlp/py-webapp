@@ -40,8 +40,8 @@ const renderLoggedOut = () => {
 const renderPlugins = async () => {
     const resp = await axios.get('/plugins')
     const plugins = resp.data
-    if (plugins.length > 1) {
-        const pluginsHeader = document.createElement('h1');
+    if (plugins.length > 0) {
+        const pluginsHeader = document.createElement('h2');
         pluginsHeader.innerText = 'Folgende Plugins sind installiert'
         pluginsContainerElement.appendChild(pluginsHeader);
     }
@@ -54,7 +54,7 @@ const renderPlugins = async () => {
 
         const pluginContainer = document.createElement('div');
         pluginContainer.innerHTML = `
-        <h2>${plugin.name}</h2>
+        <h3>${plugin.name}</h3>
         ${routeElements ? "<ul>"+routeElements+"</ul>" : ""}
         `
         pluginsContainerElement.appendChild(pluginContainer);
