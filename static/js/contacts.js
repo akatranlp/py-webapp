@@ -26,7 +26,6 @@ const loadData = async () => {
     try {
         const response = await axiosInstance.get("/contacts")
         const contacts = response.data
-        console.log(contacts)
         contacts.forEach(element => {
             const row = document.createElement("tr")
             const contactName = document.createElement("td")

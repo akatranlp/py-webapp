@@ -8,6 +8,8 @@
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', path='/js/contacts.js') }}" type="module"></script>
     <script src="{{ url_for('static', path='/js/repo.js') }}" type="module"></script>
 </head>
@@ -22,21 +24,42 @@
     <div>
         <div data-alert hidden="" class="alert alert-danger p-1"></div>
         <hr>
-        <form id="addContact" data-form class="row g-3 m-1 p-2 border border-primary rounded" action=""
-              method="post">
-            <div class="col-md-6 mb-1">
-                <input data-name type="text" class="form-control" placeholder="Nachname" id="name" name=name required>
+        <button class="btn btn-success mr-sm-2" type="button" data-toggle="modal"
+                data-target="#createModal">Neuen Kontakt erstellen
+        </button>
+        <hr>
+        <div id="createModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <form data-form class="form-container" action="" method="post">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Neuen Kontakt erstellen</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="name"></label><input data-name type="text" class="form-control"
+                                                             placeholder="Nachname" id="name" name=name
+                                                             maxlength="25" required>
+
+                            <label for="firstname"></label><input data-firstname type="text" class="form-control"
+                                                                  placeholder="Vorname" id="firstname"
+                                                                  name=firstname maxlength="25" required>
+
+                            <label for="email"></label><input data-email type="email" class="form-control"
+                                                              placeholder="Email" id="email"
+                                                              name=email maxlength="50" required>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <div>
+                                <button id="createButton" type="submit" class="btn btn-primary mr-sm-2">
+                                    Kontakt erstellen
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="col-md-6 mb-1">
-                <input data-firstname type="text" class="form-control" placeholder="Vorname" id="firstname" name=firstname required>
-            </div>
-            <div class="col-md-10 mb-1">
-                <input data-email type="email" class="form-control" placeholder="Email" id="email" name=email required>
-            </div>
-            <div class="col-md-2 d-flex justify-content-end mb-1">
-                <button type="submit" class="btn btn-secondary" id="botton" name=button>Kontakt erstellen</button>
-            </div>
-        </form>
+        </div>
     </div>
     <table class="table">
         <thead>
