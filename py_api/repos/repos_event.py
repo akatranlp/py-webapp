@@ -1,6 +1,5 @@
 from typing import List
 from uuid import UUID
-
 from fastapi import HTTPException, status
 from ..schemas import schemas_event
 from ..models import models_event, models_user, models_contact
