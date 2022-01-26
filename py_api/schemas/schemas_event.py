@@ -28,7 +28,7 @@ class EventParticipantOut(BaseModel):
 
     @classmethod
     async def from_model(cls, model: models_event.EventParticipant):
-        user = await model.user
+        user = (await model.user) if model.user else None
         contact = await model.contact
         return EventParticipantOut(
             contact_uuid=contact.uuid,

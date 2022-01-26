@@ -13,11 +13,8 @@ async def get_all(user: models_user.User) -> List[schemas_event.Event]:
     return event_list
 
 
-async def event_participant_in_to_model(event_participant: schemas_event.EventParticipantIn, event_uuid):
-    try:
-        event_obj = await models_event.Event.get(uuid=event_uuid)
-    except:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Event not found')
+async def event_participant_in_to_model(event_participant: schemas_event.EventParticipantIn,
+                                        event_obj: models_event.Event):
     try:
         contact_obj = await models_contact.Contact.get(uuid=event_participant.contact_uuid)
     except:
@@ -40,6 +37,7 @@ async def event_participant_in_to_model(event_participant: schemas_event.EventPa
         await event_participant_obj.save()
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Hat nicht funktioniert')
+    return event_participant_obj
 
 
 async def create_event(event: schemas_event.EventIn, user: models_user.User) -> schemas_event.EventOut:
@@ -57,7 +55,7 @@ async def create_event(event: schemas_event.EventIn, user: models_user.User) -> 
 
     if event.participants:
         for p in set([p.contact_uuid for p in event.participants]):
-            await event_participant_in_to_model(schemas_event.EventParticipantIn(contact_uuid=p), event_obj.uuid)
+            await event_participant_in_to_model(schemas_event.EventParticipantIn(contact_uuid=p), event_obj)
     return await schemas_event.EventOut.from_model(event_obj)
 
 
@@ -86,7 +84,7 @@ async def change_event(uuid: UUID, event: schemas_event.EventPut, user: models_u
                 await (await models_event.EventParticipant.get(contact_id=p, event=event_obj)).delete()
         for p in after_participant_set:
             if p not in intersection:
-                await event_participant_in_to_model(schemas_event.EventParticipantIn(contact_uuid=p), event_obj.uuid)
+                await event_participant_in_to_model(schemas_event.EventParticipantIn(contact_uuid=p), event_obj)
     if event.title:
         event_obj.title = event.title
     if event.start_date:
