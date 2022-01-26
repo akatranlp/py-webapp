@@ -104,3 +104,10 @@ class EventPut(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class InvitationsStatus(BaseModel):
+    status_id: int
+
+    class Config:
+        extra = Extra.forbid
