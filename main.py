@@ -4,7 +4,8 @@ from py_api.plugins.plugin_helper import PluginLoader, PluginSchema
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from py_api.routers import routers_user, routers_auth, routers_client, routers_event, routers_contact, routers_todo
+from py_api.routers import routers_user, routers_auth, routers_client, routers_event, routers_contact, routers_todo, \
+    routers_invitation
 from tortoise.contrib.fastapi import register_tortoise
 from py_api.config import Config
 
@@ -52,6 +53,7 @@ app.include_router(routers_client.router)
 app.include_router(routers_event.router)
 app.include_router(routers_contact.router)
 app.include_router(routers_todo.router)
+app.include_router(routers_invitation.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
