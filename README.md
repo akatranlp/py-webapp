@@ -7,8 +7,10 @@ geschrieben wurde.
 
 Zum starten des Servers wird eine python version > 3.6 benötigt (beim developement wurde 3.9 genutzt).
 
-Nachdem die dependencies mithilfe der setup.py installiert wurden, wird der Server über
-"uvicorn main:app" fürs development gestartet.
+Nachdem die dependencies mithilfe der setup.py installiert wurden, muss die write_data.py ausgeführt werden,
+hier werden zwei Benutzer erstellt aber auch die StatusTabelle mit ihren Daten gefüllt.
+
+Anschließend wird der Server über "uvicorn main:app" fürs development gestartet.
 
 FastAPI erstellt automatisch eine interaktive doku mit Swagger oder alternativ mit redoc
 hierfür sind die links /docs und /redoc
