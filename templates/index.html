@@ -4,9 +4,38 @@
     <meta charset="UTF-8">
     <title>Hallo Welt</title>
     <link href="{{ url_for('static', path='/css/index.css') }}" rel="stylesheet">
-    <script src="{{ url_for('static', path='/js/index.js') }}"></script>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', path='/js/index.js') }}" defer></script>
 </head>
 <body>
+<nav data-nav-loggedIn class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20" hidden>
+    <!-- Logindaten -->
+    <div class="row pl-3">
+        <a class="btn btn-danger text-white mr-sm-2" href="/logout">Ausloggen</a>
+        <a class="btn btn-secondary text-white mr-sm-2" href="/account">Einstellungen</a>
+        <div>
+            <p class="text-white text-justify m-2 mr-4">Eingeloggt als:
+                <b class="text-white" data-me></b>
+            </p>
+        </div>
+    </div>
+    <!-- Kalender und Adressbuch -->
+    <div>
+        <a class="btn btn-info mr-sm-2" href="/todo">ToDo-Liste</a>
+        <a class="btn btn-success text-white mr-sm-2" href="/calendar">Kalender</a>
+        <a class="btn btn-warning mr-sm-2" href="/contact">Adressbuch</a>
+    </div>
+</nav>
+<nav data-nav-loggedOut class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20" hidden>
+    <div class="row pl-3">
+        <a class="loggedIn btn btn-light mr-sm-2" href="/login">Login</a>
+        <a class="loggedIn btn btn-light mr-sm-2" href="/register">Register</a>
+    </div>
+</nav>
 <h1>Hallo Welt!!!</h1>
+<p>Willkommen auf unserer wunderbaren Seite!</p>
+<div data-plugins-container></div>
 </body>
 </html>

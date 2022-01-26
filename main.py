@@ -2,6 +2,7 @@ import warnings
 from typing import List
 from py_api.plugins.plugin_helper import PluginLoader, PluginSchema
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from py_api.routers import routers_user, routers_auth, routers_client, routers_event, routers_contact, routers_todo, \
     routers_invitation
@@ -80,6 +81,11 @@ def hello():
         'success': True,
         'message': 'Hello World'
     }
+
+
+@app.get("/favicon.ico", response_class=FileResponse, include_in_schema=False)
+async def favicon():
+    return FileResponse('static/img/favicon.ico')
 
 
 register_tortoise(
