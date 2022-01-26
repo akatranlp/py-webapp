@@ -14,10 +14,9 @@ router = APIRouter(
 )
 
 
-# TODO: add User Authentication and Participant support
-@router.get('/', response_model=List[schemas_event.EventOut])
+@router.get('/', response_model=List[schemas_event.Event])
 async def get_all(user: models_user.User =
-                  Depends(oauth2.get_current_active_user_model)) -> List[schemas_event.EventOut]:
+                  Depends(oauth2.get_current_active_user_model)) -> List[schemas_event.Event]:
     return await repos_event.get_all(user)
 
 
