@@ -105,3 +105,43 @@ async def delete_event(uuid: UUID, user: models_user.User):
     event = await schemas_event.EventOut.from_model(event_obj)
     await event_obj.delete()
     return event
+
+
+async def get_all_entries(uuid: UUID, user: models_user.User) -> List[schemas_event.EventParticipantOut]:
+    event_obj = await _get_event(uuid, user)
+    participants = []
+    async for participant in models_event.EventParticipant.filter(event=event_obj):
+        participants.append(await schemas_event.EventParticipantOut.from_model(participant))
+    return participants
+
+
+async def create_entry(uuid: UUID,
+                       participant: schemas_event.EventParticipantIn,
+                       user: models_user.User) -> schemas_event.EventParticipantOut:
+    event_obj = await _get_event(uuid, user)
+    try:
+        await models_event.EventParticipant.get(contact_id=participant.contact_uuid, event=event_obj)
+    except:
+        return await schemas_event.EventParticipantOut.from_model(
+            await event_participant_in_to_model(participant, event_obj)
+        )
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Contact ist bereits in der Liste')
+
+
+async def _get_entry(uuid: UUID, contact_uuid: UUID, user: models_user.User) -> models_event.EventParticipant:
+    event_obj = await _get_event(uuid, user)
+    participant_obj = await models_event.EventParticipant.get(contact_id=contact_uuid, event=event_obj)
+    if not participant_obj:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Entry not found')
+    return participant_obj
+
+
+async def get_entry(uuid: UUID, contact_uuid: UUID, user: models_user.User) -> schemas_event.EventParticipantOut:
+    return await schemas_event.EventParticipantOut.from_model(await _get_entry(uuid, contact_uuid, user))
+
+
+async def delete_entry(uuid: UUID, contact_uuid: UUID, user: models_user.User) -> schemas_event.EventParticipantOut:
+    participant_obj = await _get_entry(uuid, contact_uuid, user)
+    participant = await schemas_event.EventParticipantOut.from_model(participant_obj)
+    await participant_obj.delete()
+    return participant
