@@ -1,14 +1,26 @@
 import {user, axiosInstance} from "./repo.js";
 
-const formElement = document.querySelector("[data-form]")
+const formCreate = document.querySelector("[data-form-create]")
+const formEdit = document.querySelector("[data-form-edit]")
 const errorAlert = document.querySelector("[data-alert]");
+const editTitle = document.querySelector("[data-edit-title]");
+const editDescription = document.querySelector("[data-edit-description]");
+const editUUID = document.querySelector("[data-edit-uuid]");
+const editParent = document.querySelector("[data-edit-parent]");
 const activeContainer = document.querySelector("[data-active-container]");
 const finishedContainer = document.querySelector("[data-finished-container]");
 
 function init() {
-    formElement.addEventListener("submit", async (event) => {
-        createTodo(event)
+    formCreate.addEventListener("submit", async (event) => {
         event.preventDefault()
+        createTodo(event)
+        $('#createModal').modal('hide'); //Bisschen JQuery für Bootstrap Modal, da das auf JQuery basiert
+    })
+    formEdit.addEventListener("submit", async (event) => {
+        event.preventDefault()
+        changeTitleDescription(event)
+        $('#editModal').modal('hide'); //Bisschen JQuery für Bootstrap Modal, da das auf JQuery basiert
+
     })
     loadData()
 }
@@ -26,22 +38,24 @@ async function loadData() {
 
 async function changeStatus(uuid) {
     try {
-        const resp = await axiosInstance.put("/todos/" + uuid,{
+        const resp = await axiosInstance.put("/todos/" + uuid, {
             toggle: true
         })
-        updateTodo(oldTodoObject, resp.data)
+        loadTodo(resp.data)
+
     } catch (e) {
         openErrorAlert("Fehler beim Ändern des Todo-Status", e)
     }
 }
 
-async function changeTitleDescription(uuid, title, description) {
+async function changeTitleDescription(event) {
+    console.log(event)
     try {
-        const resp = await axiosInstance.put("/todos/" + uuid,{
-            title: "Title",
-            description: "Description"
+        const resp = await axiosInstance.put("/todos/" + event.target[1].value, {
+            title: event.target[3].value,
+            description: event.target[4].value
         })
-        loadTodo(resp.data)
+        updateTodoVisually(event.target[2].value, resp.data)
     } catch (e) {
         openErrorAlert("Fehler beim Ändern des Todos", e)
     }
@@ -63,44 +77,33 @@ async function createTodo(event) {
         })
         loadTodo(resp.data)
     } catch (error) {
-        openErrorAlert("Fehler beim erstellen des Todos", error)
+        openErrorAlert("Fehler beim Erstellen des Todos", error)
     }
-    event.preventDefault()
 }
 
 //---- Normale Funktionen ----//
 //Lädt das To-Do 'curTodo'
 function loadTodo(curTodo) {
+    //Generelles Objekt ------------------------------------------------------------------------------------------------
     let todoObject
     todoObject = document.createElement('div')
     curTodo.status ? finishedContainer.appendChild(todoObject) : activeContainer.appendChild(todoObject)
     todoObject.className = "p-2 border border-info rounded highlight mb-1"
+    // Titel -----------------------------------------------------------------------------------------------------------
     let title = document.createElement('h2')
     title.innerText = curTodo.title;
     title.className = "text-wrap text-break"
     todoObject.appendChild(title)
+    // Beschreibung ----------------------------------------------------------------------------------------------------
     let description = document.createElement('p')
     description.innerText = curTodo.description;
     description.className = "text-wrap text-break"
-
     todoObject.appendChild(description)
+    //Div für die Knopfe -----------------------------------------------------------------------------------------------
     let buttonDiv = document.createElement('div')
-    buttonDiv.className = "d-flex justify-content-end"
+    buttonDiv.className = "d-flex justify-content-between"
     todoObject.appendChild(buttonDiv)
-    let buttonChangeStatus = document.createElement('a')
-
-    buttonChangeStatus.addEventListener("click", () => {
-        changeStatus(curTodo.uuid)
-        buttonChangeStatus.parentElement.parentElement.remove() //Löscht das TodoObjekt
-    })
-    if (curTodo.status) {
-        buttonChangeStatus.className = "btn btn-warning ml-2"
-        buttonChangeStatus.innerText = "Reaktivieren"
-    } else {
-        buttonChangeStatus.className = "btn btn-success ml-2 text-white"
-        buttonChangeStatus.innerText = "Erledigt"
-    }
-    buttonDiv.appendChild(buttonChangeStatus)
+    //-- Knopf zum Löschen des Todos -----------------------------------------------------------------------------------
     let buttonDelete = document.createElement('a')
     buttonDelete.className = "btn btn-danger ml-2 text-white"
     buttonDelete.addEventListener("click", () => {
@@ -109,9 +112,40 @@ function loadTodo(curTodo) {
     })
     buttonDelete.innerText = "Löschen"
     buttonDiv.appendChild(buttonDelete)
+    //Div für Bearbeiten/Statusändern ----------------------------------------------------------------------------------
+    let divEditButtons = document.createElement('div')
+    buttonDiv.appendChild(divEditButtons)
+    //Knopf zum Editieren ----------------------------------------------------------------------------------------------
+    let buttonEdit = document.createElement('a')
+    buttonEdit.className = "btn btn-info ml-2 text-white"
+    buttonEdit.setAttribute("data-toggle","modal")
+    buttonEdit.setAttribute("data-target","#editModal")
+    buttonEdit.addEventListener("click", () => {
+        editTitle.value = title.innerText
+        editDescription.value = description.innerText
+        editUUID.value = curTodo.uuid
+        editParent.value = todoObject
+    })
+    buttonEdit.innerHTML = "Editieren"
+    divEditButtons.appendChild(buttonEdit)
+    //Knopf zum Status Ändern ------------------------------------------------------------------------------------------
+    let buttonChangeStatus = document.createElement('a')
+    buttonChangeStatus.addEventListener("click", () => {
+        changeStatus(curTodo.uuid)
+        buttonChangeStatus.parentElement.parentElement.parentElement.remove() //Löscht das TodoObjekt
+    })
+    if (curTodo.status) {
+        buttonChangeStatus.className = "btn btn-warning ml-2"
+        buttonChangeStatus.innerText = "Reaktivieren"
+    } else {
+        buttonChangeStatus.className = "btn btn-success ml-2 text-white"
+        buttonChangeStatus.innerText = "Erledigt"
+    }
+    divEditButtons.appendChild(buttonChangeStatus)
+
 }
 
-function updateTodo(oldTodoObject, newTodoData){
+function updateTodoVisually(oldTodoObject, newTodoData) {
     console.log(oldTodoObject)
 }
 
