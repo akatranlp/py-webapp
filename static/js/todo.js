@@ -20,16 +20,30 @@ async function loadData() {
         const todos = resp.data
         todos.forEach(el => loadTodo(el))
     } catch (e) {
-        openErrorAlert("Fehler beim laden der Todos", e)
+        openErrorAlert("Fehler beim Laden der Todos", e)
     }
 }
 
 async function changeStatus(uuid) {
     try {
-        const resp = await axiosInstance.put("/todos/" + uuid)
+        const resp = await axiosInstance.put("/todos/" + uuid,{
+            toggle: true
+        })
+        updateTodo(oldTodoObject, resp.data)
+    } catch (e) {
+        openErrorAlert("Fehler beim Ändern des Todo-Status", e)
+    }
+}
+
+async function changeTitleDescription(uuid, title, description) {
+    try {
+        const resp = await axiosInstance.put("/todos/" + uuid,{
+            title: "Title",
+            description: "Description"
+        })
         loadTodo(resp.data)
     } catch (e) {
-        openErrorAlert("Fehler beim ändern des Todo-Status", e)
+        openErrorAlert("Fehler beim Ändern des Todos", e)
     }
 }
 
@@ -37,7 +51,7 @@ async function deleteTodo(uuid) {
     try {
         await axiosInstance.delete("/todos/" + uuid)
     } catch (e) {
-        openErrorAlert("Fehler beim ändern des Passworts", e)
+        openErrorAlert("Fehler beim Ändern des Passworts", e)
     }
 }
 
@@ -95,6 +109,10 @@ function loadTodo(curTodo) {
     })
     buttonDelete.innerText = "Löschen"
     buttonDiv.appendChild(buttonDelete)
+}
+
+function updateTodo(oldTodoObject, newTodoData){
+    console.log(oldTodoObject)
 }
 
 function openErrorAlert(text, e) {

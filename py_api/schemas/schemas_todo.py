@@ -18,7 +18,7 @@ TodoOut = pydantic_model_creator(models_todo.Todo,
 
 class TodoPut(BaseModel):
     title: Optional[str]
-    status: Optional[bool]
+    toggle: Optional[bool]
     description: Optional[str]
 
     class Config:
