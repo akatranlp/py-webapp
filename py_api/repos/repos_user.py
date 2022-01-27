@@ -43,7 +43,7 @@ async def delete_user(user_name: str) -> schemas_user.UserOut:
     return user_obj
 
 
-async def create(user: schemas_user.UserRegister) -> schemas_user.User:
+async def create(user: schemas_user.UserRegister) -> schemas_user.UserOut:
     user_obj = models_user.User(username=user.username,
                                 password_hash=hashing.hash_password(user.password_hash),
                                 email=user.email)
@@ -51,4 +51,4 @@ async def create(user: schemas_user.UserRegister) -> schemas_user.User:
         await user_obj.save()
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Username or Email already taken')
-    return await schemas_user.User.from_tortoise_orm(user_obj)
+    return await schemas_user.UserOut.from_tortoise_orm(user_obj)
