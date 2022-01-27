@@ -30,10 +30,10 @@ from py_api.models import models_user, models_event, models_contact, models_todo
 @pytest.fixture(scope='module')
 def test_user() -> Generator:
     yield {
-        'id': None,
         'username': 'Test',
         'password': get_random_string(32),
         'password_hash': None,
+        'is_admin': False,
         'email': 'test@test.com'
     }
 
@@ -41,10 +41,10 @@ def test_user() -> Generator:
 @pytest.fixture(scope='module')
 def admin_user() -> Generator:
     yield {
-        'id': None,
         'username': 'adminTest',
         'password': get_random_string(32),
         'password_hash': None,
+        'is_admin': True,
         'email': 'admin@test.com'
     }
 
@@ -70,7 +70,9 @@ def test_event() -> Generator:
            'start_date': '2021-12-14T14:00:37.000001+00:00',
            'end_date': '2021-12-15T14:00:37.000001+00:00',
            'description': 'Dies ist ein Test Termin!!',
-           'location': 'Hochschule Flensburg'}
+           'location': 'Hochschule Flensburg',
+           'creator_email': 'test@test.com',
+           'creator_username': 'Test'}
 
 
 @pytest.fixture(scope='module')
@@ -103,8 +105,8 @@ def test_read_main(client: TestClient):
 
 def test_read_users(client: TestClient):
     response = client.get('/users')
-    assert response.status_code == 200
-    assert response.json() == []
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
 
 
 def create_user(client: TestClient, user: dict):
@@ -113,34 +115,30 @@ def create_user(client: TestClient, user: dict):
     assert response.status_code == 200, response.text
     data = response.json()
     assert data['username'] == user['username'], data['email'] == user['email']
-    assert 'id' in data
-    user['id'] = data['id']
-    assert 'password_hash' in data
-    user['password_hash'] = data['password_hash']
 
 
 def test_create_user(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
     create_user(client, test_user)
 
     async def get_user_by_db():
-        user = await models_user.User.get(id=test_user['id'])
+        user = await models_user.User.get(username=test_user['username'])
         return user
 
     user_obj = event_loop.run_until_complete(get_user_by_db())
-    assert user_obj.id == test_user['id']
+    assert user_obj.username == test_user['username']
 
 
 def test_create_admin(client: TestClient, event_loop: asyncio.AbstractEventLoop, admin_user: dict):
     create_user(client, admin_user)
 
     async def change_to_admin_and_return():
-        user = await models_user.User.get(id=admin_user['id'])
+        user = await models_user.User.get(username=admin_user['username'])
         user.is_admin = True
         await user.save()
         return user
 
     user_obj: models_user.User = event_loop.run_until_complete(change_to_admin_and_return())
-    assert user_obj.id == admin_user['id']
+    assert user_obj.username == admin_user['username']
     assert user_obj.is_admin
 
 
@@ -165,25 +163,6 @@ def test_not_all_delivered(client: TestClient, event_loop: asyncio.AbstractEvent
                    {'loc': ['body', 'email'], 'msg': 'field required', 'type': 'value_error.missing'}]}
 
 
-def test_read_users_again(client: TestClient):
-    response = client.get('/users')
-    assert response.status_code == 200
-    assert response.json() == [{'email': 'test@test.com', 'username': 'Test'},
-                               {'email': 'admin@test.com', 'username': 'adminTest'}]
-
-
-def test_unauthorized(client: TestClient):
-    response = client.get('/users/me')
-    assert response.status_code == 401
-    assert response.json() == {'detail': 'Not authenticated'}
-
-
-def test_does_not_exist(client: TestClient):
-    response = client.post('/login', data={'username': 'Hello', 'password': 'hello'})
-    assert response.status_code == 404
-    assert response.json() == {'detail': 'Object does not exist'}
-
-
 def login(client: TestClient, user: dict) -> str:
     form = {
         'username': user['username'],
@@ -199,6 +178,28 @@ def login(client: TestClient, user: dict) -> str:
     return data['access_token']
 
 
+def test_read_users_again(client: TestClient, admin_user: dict):
+    token = login(client, admin_user)
+    headers = {'Authorization': f'Bearer {token}'}
+
+    response = client.get('/users', headers=headers)
+    assert response.status_code == 200
+    assert response.json() == [{'email': 'test@test.com', 'username': 'Test', 'is_admin': False},
+                               {'email': 'admin@test.com', 'username': 'adminTest', 'is_admin': True}]
+
+
+def test_unauthorized(client: TestClient):
+    response = client.get('/users/me')
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+
+def test_does_not_exist(client: TestClient):
+    response = client.post('/login', data={'username': 'Hello', 'password': 'hello'})
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Object does not exist'}
+
+
 def test_login(client: TestClient, test_user: dict):
     assert login(client, test_user)
     client.cookies.clear_session_cookies()
@@ -211,7 +212,8 @@ def test_me(client: TestClient, test_user: dict):
 
     response = client.get('/users/me', headers=headers)
     assert response.status_code == 200
-    assert response.json() == {'username': test_user['username'], 'email': test_user['email']}
+    assert response.json() == {'username': test_user['username'], 'email': test_user['email'],
+                               'is_admin': test_user['is_admin']}
     client.cookies.clear_session_cookies()
 
 
@@ -257,61 +259,7 @@ def test_get_user(client: TestClient, test_user: dict, admin_user: dict):
 
     response = client.get('/users/adminTest', headers=headers)
     assert response.status_code == 200
-    assert response.json() == {'email': 'admin@test.com', 'username': 'adminTest'}
-    client.cookies.clear_session_cookies()
-
-
-def test_deactivate_user(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict, admin_user: dict):
-    token = login(client, test_user)
-    headers = {'Authorization': f'Bearer {token}'}
-    response = client.delete('/users/Test', headers=headers)
-
-    assert response.status_code == 401
-    assert response.json() == {'detail': 'you are not permitted to do that'}
-    client.cookies.clear_session_cookies()
-
-    token = login(client, admin_user)
-    headers = {'Authorization': f'Bearer {token}'}
-
-    response = client.delete('/users/Test', headers=headers)
-    assert response.status_code == 200
-    assert response.json() == {'email': 'test@test.com', 'username': 'Test'}
-
-    response = client.get('/users')
-    assert response.status_code == 200
-    assert response.json() == [{'email': 'admin@test.com', 'username': 'adminTest'}]
-
-    async def get_user_by_db():
-        user = await models_user.User.get(id=test_user['id'])
-        return user
-
-    user_obj: models_user.User = event_loop.run_until_complete(get_user_by_db())
-    assert user_obj.id == test_user['id']
-    assert not user_obj.is_active
-    client.cookies.clear_session_cookies()
-
-
-def test_deactivate_login(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_user: dict):
-    form = {
-        'username': test_user['username'],
-        'password': test_user['password']
-    }
-
-    response = client.post('/login', data=form)
-    assert response.status_code == 401
-    assert response.json() == {'detail': 'your account is not active'}
-
-    async def set_user_active_again():
-        user = await models_user.User.get(id=test_user['id'])
-        user.is_active = True
-        await user.save()
-        return user
-
-    user_obj: models_user.User = event_loop.run_until_complete(set_user_active_again())
-    assert user_obj.id == test_user['id']
-    assert user_obj.is_active
-
-    assert login(client, test_user)
+    assert response.json() == {'email': 'admin@test.com', 'username': 'adminTest', 'is_admin': True}
     client.cookies.clear_session_cookies()
 
 
@@ -347,7 +295,7 @@ def test_change_password(client: TestClient, event_loop: asyncio.AbstractEventLo
     assert cookie != client.cookies['jib']
 
     async def get_user_by_db():
-        user = await models_user.User.get(id=test_user['id'])
+        user = await models_user.User.get(username=test_user['username'])
         return user
 
     user_obj: models_user.User = event_loop.run_until_complete(get_user_by_db())
@@ -370,11 +318,11 @@ def test_logout(client: TestClient, test_user: dict):
 
     response = client.get('/logout', allow_redirects=False)
     assert response.status_code == 307
-    assert response.headers['location'] == '/'
+    assert response.headers['location'] == '/login'
 
     response = client.send(response.next)
     assert response.status_code == 200
-    assert response.url == f'{client.base_url}/'
+    assert response.url == f'{client.base_url}/login'
 
     assert len(client.cookies) == 0
     assert not client.cookies.get('jib')
@@ -412,6 +360,8 @@ def test_get_events(client: TestClient, test_user: dict):
 
 
 def validate_event_json(json_data, event):
+    print(json_data)
+    print(event)
     return json_data == {'uuid': event['uuid'],
                          'system_id': event['system_id'],
                          'created_at': event['created_at'],
@@ -420,7 +370,10 @@ def validate_event_json(json_data, event):
                          'start_date': event['start_date'],
                          'end_date': event['end_date'],
                          'description': event['description'],
-                         'location': event['location']}
+                         'location': event['location'],
+                         'creator_email': event['creator_email'],
+                         'creator_username': event['creator_username'],
+                         'participants': []}
 
 
 def test_create_event(client: TestClient, event_loop: asyncio.AbstractEventLoop, test_event: dict, test_user: dict):
@@ -429,7 +382,6 @@ def test_create_event(client: TestClient, event_loop: asyncio.AbstractEventLoop,
         "start_date": test_event['start_date'],
         "end_date": test_event['end_date'],
         "description": test_event['description'],
-        # participants: Optional[List[schemas_user.UserOut]]  # muss ContactOut sein
         "location": test_event['location']
     }
 
@@ -461,7 +413,7 @@ def test_create_event(client: TestClient, event_loop: asyncio.AbstractEventLoop,
 
     event_obj = event_loop.run_until_complete(get_event_by_db())
     assert event_obj.uuid == UUID(test_event['uuid'])
-    assert event_obj.creator.id == test_user['id']
+    assert event_obj.creator.username == test_user['username']
     client.cookies.clear_session_cookies()
 
 
@@ -496,7 +448,10 @@ def test_get_events_again(client: TestClient, test_event: dict, test_user: dict,
                                 'start_date': test_event['start_date'],
                                 'end_date': test_event['end_date'],
                                 'description': test_event['description'],
-                                'location': test_event['location']}]
+                                'location': test_event['location'],
+                                'participants': [],
+                                'creator_email': test_event['creator_email'],
+                                'creator_username': test_event['creator_username']}]
 
     token = login(client, admin_user)
     headers = {'Authorization': f'Bearer {token}'}
@@ -693,7 +648,7 @@ def test_create_contact(client: TestClient, event_loop: asyncio.AbstractEventLoo
 
     contact_obj = event_loop.run_until_complete(get_contact_by_db())
     assert contact_obj.uuid == UUID(test_contact['uuid'])
-    assert contact_obj.creator.id == test_user['id']
+    assert contact_obj.creator.username == test_user['username']
     client.cookies.clear_session_cookies()
 
 
@@ -949,7 +904,7 @@ def test_create_todo(client: TestClient, event_loop: asyncio.AbstractEventLoop, 
 
     todo_obj = event_loop.run_until_complete(get_todo_by_db())
     assert todo_obj.uuid == UUID(test_todo['uuid'])
-    assert todo_obj.creator.id == test_user['id']
+    assert todo_obj.creator.username == test_user['username']
     client.cookies.clear_session_cookies()
 
 
