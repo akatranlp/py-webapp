@@ -83,12 +83,12 @@ function loadTodo(curTodo) {
         buttonChangeStatus.className = "btn btn-warning ml-2"
         buttonChangeStatus.innerText = "Reaktivieren"
     } else {
-        buttonChangeStatus.className = "btn btn-success ml-2"
+        buttonChangeStatus.className = "btn btn-success ml-2 text-white"
         buttonChangeStatus.innerText = "Erledigt"
     }
     buttonDiv.appendChild(buttonChangeStatus)
     let buttonDelete = document.createElement('a')
-    buttonDelete.className = "btn btn-danger ml-2"
+    buttonDelete.className = "btn btn-danger ml-2 text-white"
     buttonDelete.addEventListener("click", () => {
         deleteTodo(curTodo.uuid)
         buttonDelete.parentElement.parentElement.remove() //Löscht das TodoObjekt
