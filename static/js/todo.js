@@ -70,9 +70,12 @@ function loadTodo(curTodo) {
     todoObject.className = "p-2 border border-info rounded highlight mb-1"
     let title = document.createElement('h2')
     title.innerText = curTodo.title;
+    title.className = "text-wrap text-break"
     todoObject.appendChild(title)
     let description = document.createElement('p')
     description.innerText = curTodo.description;
+    description.className = "text-wrap text-break"
+
     todoObject.appendChild(description)
     let buttonDiv = document.createElement('div')
     buttonDiv.className = "d-flex justify-content-end"
