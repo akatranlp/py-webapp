@@ -36,6 +36,12 @@ def logout(response: Response):
     response.delete_cookie(key='jib', path='/refresh_token')
 
 
+async def logout_all(user: models_user.User, response: Response):
+    user.token_version += 1
+    await user.save()
+    response.delete_cookie(key='jib', path='/refresh_token')
+
+
 async def refresh_token(request: Request, response: Response) -> schemas_user.UserToken:
     exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Refresh Token invalid')
     try:
