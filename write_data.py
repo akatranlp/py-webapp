@@ -10,7 +10,7 @@ def main():
                     f"VALUES ('admin', '{admin_password_hash}', 1, 'admin@email.com'),"
                     f"('user', '{user_password_hash}', 0, 'user@email.com')")
         con.commit()
-        con.execute("INSERT INTO eventparticipantstatus"
+        con.execute("INSERT INTO eventparticipantstatus(id, status)"
                     "VALUES (1, 'Accepted'),"
                     "(2, 'Pending'),"
                     "(3, 'Declined')")

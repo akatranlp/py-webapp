@@ -68,7 +68,8 @@ const init = async () => {
         </div>
     </div>
     <!-- Kalender und Adressbuch -->
-    <div>
+    <div data-nav-links-container>
+        <a class="btn btn-primary text-white mr-sm-2" href="/">Startseite</a>
         <a class="btn btn-info mr-sm-2" href="/todo">ToDo-Liste</a>
         <a class="btn btn-success text-white mr-sm-2" href="/calendar">Kalender</a>
         <a class="btn btn-warning mr-sm-2" href="/contact">Adressbuch</a>
