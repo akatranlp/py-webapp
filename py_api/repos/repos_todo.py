@@ -32,6 +32,9 @@ async def get_todo(uuid: UUID, user: models_user.User):
 
 # Ein _Todo erstellen
 async def create_todo(todo: schemas_todo.TodoIn, user: models_user.User) -> schemas_todo.TodoOut:
+    if todo.title == "":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail='missing_title')
     todo_obj = models_todo.Todo(
         title=todo.title,
         description=todo.description,
@@ -41,7 +44,7 @@ async def create_todo(todo: schemas_todo.TodoIn, user: models_user.User) -> sche
     except Exception as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail='Beim Erstellen des ToDos ist ein Fehler aufgetreten.')
+                            detail='unparsable_input')
     return await schemas_todo.TodoOut.from_tortoise_orm(todo_obj)
 
 
