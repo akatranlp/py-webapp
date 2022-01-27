@@ -6,6 +6,9 @@
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- Wird für JS Bootstrap benötigt, was ich für die Bootstrap Modal benötige -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', path='/js/repo.js') }}" type="module"></script>
     <script src="{{ url_for('static', path='/js/todo.js') }}" type="module"></script>
 </head>
@@ -18,23 +21,9 @@
     <h1>ToDo - Liste</h1>
     <div data-alert hidden="" class="alert alert-danger p-1"></div>
     <hr>
-    <a data-open-create-form-button class="btn btn-success m-1 text-white">Neues ToDo erstellen</a>
-    <div hidden="Bananenbrot" data-create-form class="p-2 border border-success rounded highlight mb-1">
-
-        <form data-form id="createTodo">
-            <label class="m-0 mt-1"> Titel</label>
-            <input data-create-title class="form-control" id="title" name=title required maxlength="128">
-            <label class="m-0 mt-1">Beschreibung</label>
-            <textarea data-create-description class="form-control" id="description" name=description></textarea>
-            <div class="d-flex justify-content-between">
-                <button data-close-create-form-button class="btn btn-warning mt-1">Schließen</button>
-                <button data-create-button class="btn btn-success mt-1 text-white" id="button" name=button
-                        type="submit">Neues ToDo erstellen
-                </button>
-            </div>
-        </form>
-
-    </div>
+    <button class="btn btn-success mr-sm-2" type="button" data-toggle="modal" data-target="#createModal">
+        Neues ToDo erstellen
+    </button>
     <hr>
     <div class="d-flex flex-row justify-content-around">
         <h2 class="flex-column text-center">Zu erledigen</h2>
@@ -45,6 +34,33 @@
         <div data-active-container class="w-50 p-1 col"></div>
         <div data-finished-container class="w-50 p-1 col"></div>
     </div>
+</div>
+<!--Modalfenster fürs Erstellen von Todos -->
+<div id="createModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <form data-form id="createTodo">
+                <div class="modal-header">
+                    <h4 class="modal-title">ToDo erstellen</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label class="m-0 mt-1"> Titel</label>
+                    <input data-create-title class="form-control" id="title" name=title required maxlength="128">
+                    <label class="m-0 mt-1">Beschreibung</label>
+                    <textarea data-create-description class="form-control" id="description"
+                              name=description></textarea>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button class="btn btn-warning mt-1">Schließen</button>
+                    <button class="btn btn-success mt-1 text-white" id="button" name=button
+                            type="submit">Neues ToDo erstellen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </div>
 </body>
 </html>

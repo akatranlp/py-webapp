@@ -2,10 +2,6 @@ import {user, axiosInstance} from "./repo.js";
 
 const formElement = document.querySelector("[data-form]")
 const errorAlert = document.querySelector("[data-alert]");
-const openCreateForm = document.querySelector("[data-open-create-form-button]");
-const closeCreateForm = document.querySelector("[data-close-create-form-button]");
-const createDescription = document.querySelector("[data-create-description]");
-const createForm = document.querySelector("[data-create-form]");
 const activeContainer = document.querySelector("[data-active-container]");
 const finishedContainer = document.querySelector("[data-finished-container]");
 
@@ -14,9 +10,6 @@ function init() {
         createTodo(event)
         event.preventDefault()
     })
-    openCreateForm.addEventListener("click", () => toggleCreateForm())
-    closeCreateForm.addEventListener("click", () => toggleCreateForm())
-    //createButton.addEventListener("click", () => createTodo())
     loadData()
 }
 
@@ -51,8 +44,8 @@ async function deleteTodo(uuid) {
 async function createTodo(event) {
     try {
         const resp = await axiosInstance.post("/todos", { //Laut https://axios-http.com/docs/post_example die struktur
-            title: event.target[0].value,
-            description: createDescription.value
+            title: event.target[1].value,
+            description: event.target[2].value
         })
         loadTodo(resp.data)
     } catch (error) {
@@ -102,17 +95,6 @@ function loadTodo(curTodo) {
     })
     buttonDelete.innerText = "Löschen"
     buttonDiv.appendChild(buttonDelete)
-}
-
-function toggleCreateForm() {
-    const cur = createForm.getAttribute("hidden")
-    if (cur) {
-        createForm.removeAttribute("hidden")
-        openCreateForm.setAttribute("hidden", "Bananenbrot")
-    } else {
-        createForm.setAttribute("hidden", "NoValueNeeded")
-        openCreateForm.removeAttribute("hidden")
-    }
 }
 
 function openErrorAlert(text, e) {
