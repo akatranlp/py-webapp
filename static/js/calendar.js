@@ -3,9 +3,6 @@ import {user, axiosInstance} from "./repo.js";
 const calenderDiv = document.getElementById("calenderContent")
 const formElement = document.querySelector("[data-form]")
 
-
-let openOrClosed = false
-
 async function f() {
 
     const response = await axiosInstance.get("/events")
@@ -48,19 +45,19 @@ async function createCalender() {
         let startDate = JSON.stringify(element.start_date)
         let spilttetStart = startDate.split("T")
         let start = spilttetStart[0].split("-")
-        let startYear = parseInt(start[0].substring(1))
-        let startMonth = parseInt(start[1])
-        let startDay = parseInt(start[2])
-        let startHour = parseInt(spilttetStart[1].split(":")[0])
-        let startMinute = parseInt(spilttetStart[1].split(":")[1])
+        let startYear = start[0].substring(1)
+        let startMonth = start[1]
+        let startDay =start[2]
+        let startHour = spilttetStart[1].split(":")[0]
+        let startMinute = spilttetStart[1].split(":")[1]
 
         let endDate = JSON.stringify(element.end_date)
         let splittetEnd = endDate.split("T")
         let end = splittetEnd[0].split("-")
-        let endYear = parseInt(end[0].substring(1))
-        let endMonth = parseInt(end[1])
-        let endDay = parseInt(end[2])
-        let endHour = parseInt(splittetEnd[1].split(":")[0])
+        let endYear = end[0].substring(1)
+        let endMonth = end[1]
+        let endDay = end[2]
+        let endHour = splittetEnd[1].split(":")[0]
         let endMinute = splittetEnd[1].split(":")[1]
 
 
@@ -68,8 +65,8 @@ async function createCalender() {
             <h1>${element.title}</h1> 
             <p>${element.description}</p>
             <p>Ort: ${element.location}</p>
-            <p><b>von</b> ${startDay}.${startMonth}.${startYear} - ${startHour}:${startMinute}<br>
-            <b>bis</b> ${endDay}.${endMonth}.${endYear} - ${endHour}:${endMinute}</p>`
+            <p><b>von:</b> ${startDay}.${startMonth}.${startYear} - ${startHour}:${startMinute}<br>
+            <b>bis:&nbsp;</b> ${endDay}.${endMonth}.${endYear} - ${endHour}:${endMinute}</p>`
 
         calenderEntries.appendChild(aItem);
         //Button zum Termin absagen hinzufügen
@@ -97,8 +94,7 @@ formElement.addEventListener("submit", async (e) => {
     }
     console.log(data)
     try {
-        const response = await axiosInstance.post("/events", data)
-        const jsonData = response.data
+        await axiosInstance.post("/events", data)
         location.reload()
     } catch (e) {
         console.log(e.response.data.detail)
