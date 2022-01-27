@@ -22,9 +22,8 @@ async def me(user: schemas_user.User = Depends(oauth2.get_out_user)) -> schemas_
     return user
 
 
-# TODO: don't return the whole user
-@router.post('/', response_model=schemas_user.User)
-async def create_user(user: schemas_user.UserRegister) -> schemas_user.User:
+@router.post('/', response_model=schemas_user.UserOut)
+async def create_user(user: schemas_user.UserRegister) -> schemas_user.UserOut:
     return await repos_user.create(user)
 
 
