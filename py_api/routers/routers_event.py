@@ -13,9 +13,9 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model=List[schemas_event.Event])
+@router.get('/', response_model=List[schemas_event.EventOut])
 async def get_all(user: models_user.User =
-                  Depends(oauth2.get_current_active_user_model)) -> List[schemas_event.Event]:
+                  Depends(oauth2.get_current_active_user_model)) -> List[schemas_event.EventOut]:
     return await repos_event.get_all(user)
 
 

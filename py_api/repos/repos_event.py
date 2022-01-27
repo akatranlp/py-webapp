@@ -5,10 +5,10 @@ from ..schemas import schemas_event
 from ..models import models_event, models_user, models_contact
 
 
-async def get_all(user: models_user.User) -> List[schemas_event.Event]:
+async def get_all(user: models_user.User) -> List[schemas_event.EventOut]:
     event_list = []
     async for event_obj in models_event.Event.filter(creator=user):
-        event_list.append(await schemas_event.Event.from_tortoise_orm(event_obj))
+        event_list.append(await schemas_event.EventOut.from_model(event_obj))
     return event_list
 
 
