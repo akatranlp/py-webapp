@@ -34,6 +34,7 @@ const loadData = async () => {
             contactFirstname.innerHTML = element.firstname
             const contactEmail = document.createElement("td")
             contactEmail.innerHTML = element.email
+            contactEmail.className = "text-wrap text-break"
 
             const deleteButton = document.createElement("button")
             deleteButton.innerHTML = "Nutzer entfernen"
