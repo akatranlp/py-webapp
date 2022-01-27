@@ -11,9 +11,9 @@ router = APIRouter(
 )
 
 
-# TODO: Only Admin can user this
 @router.get('/', response_model=List[schemas_user.UserOut])
-async def get_all() -> List[schemas_user.UserOut]:
+async def get_all(user: schemas_user.User = Depends(oauth2.get_current_active_user)) -> List[schemas_user.UserOut]:
+    oauth2.check_permission(user)
     return await repos_user.get_all()
 
 
@@ -29,15 +29,23 @@ async def create_user(user: schemas_user.UserRegister) -> schemas_user.User:
 
 
 @router.get("/{user_name}", response_model=schemas_user.UserOut)
-async def get_user(user_name: str, user: schemas_user.User = Depends(oauth2.get_current_active_user)) -> schemas_user.UserOut:
+async def get_user(user_name: str,
+                   user: schemas_user.User = Depends(oauth2.get_current_active_user)) -> schemas_user.UserOut:
     oauth2.check_permission(user)
     return await repos_user.get_user(user_name)
 
-# TODO: PUT User to make him an admin and deactivate/reactivate him !!!admin only!!!
 
-
-# TODO: really delete the user and don't do it for admin only
-@router.delete("/{user_name}", response_model=schemas_user.UserOut)
-async def get_user(user_name: str, user: schemas_user.User = Depends(oauth2.get_current_active_user)) -> schemas_user.UserOut:
+@router.put("/{user_name}", response_model=schemas_user.UserOut)
+async def change_user(user_name: str,
+                      user_obj: schemas_user.UserPut,
+                      user: schemas_user.User = Depends(oauth2.get_current_active_user)) -> schemas_user.UserOut:
     oauth2.check_permission(user)
+    return await repos_user.change_user(user_name, user_obj)
+
+
+@router.delete("/{user_name}", response_model=schemas_user.UserOut)
+async def get_user(user_name: str,
+                   user: schemas_user.User = Depends(oauth2.get_current_active_user)) -> schemas_user.UserOut:
+    if not user_name == user.username:
+        oauth2.check_permission(user)
     return await repos_user.delete_user(user_name)

@@ -1,3 +1,4 @@
+from typing import Optional
 from tortoise.contrib.pydantic import pydantic_model_creator
 from pydantic import BaseModel, Extra
 from ..models import models_user
@@ -16,7 +17,6 @@ UserOut = pydantic_model_creator(models_user.User,
                                  exclude_readonly=True,
                                  exclude=('password_hash',
                                           'is_active',
-                                          'is_admin',
                                           'token_version'))
 
 UserRegister = pydantic_model_creator(models_user.User,
@@ -25,6 +25,14 @@ UserRegister = pydantic_model_creator(models_user.User,
                                       exclude=('is_active',
                                                'is_admin',
                                                'token_version'))
+
+
+class UserPut(BaseModel):
+    is_active: Optional[bool]
+    is_admin: Optional[bool]
+
+    class Config:
+        extra = Extra.forbid
 
 
 class UserChangePassword(BaseModel):

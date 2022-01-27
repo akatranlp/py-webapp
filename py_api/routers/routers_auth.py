@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from ..repos import repos_auth
 from ..schemas import schemas_user
+from ..models import models_user
 from .. import oauth2
 
 router = APIRouter(
@@ -19,6 +20,13 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
 async def logout() -> RedirectResponse:
     response = RedirectResponse(url='/login')
     repos_auth.logout(response)
+    return response
+
+
+@router.get('/logout_all')
+async def logout_all(user: models_user.User = Depends(oauth2.get_current_active_user_model)) -> RedirectResponse:
+    response = RedirectResponse(url='/login')
+    await repos_auth.logout_all(user, response)
     return response
 
 
