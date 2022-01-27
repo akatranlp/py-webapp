@@ -1,19 +1,22 @@
 import {user, axiosInstance} from "./repo.js";
 
+const formElement = document.querySelector("[data-form]")
 const errorAlert = document.querySelector("[data-alert]");
-const createButton = document.querySelector("[data-create-button]");
 const openCreateForm = document.querySelector("[data-open-create-form-button]");
 const closeCreateForm = document.querySelector("[data-close-create-form-button]");
-const createTitle = document.querySelector("[data-create-title]");
 const createDescription = document.querySelector("[data-create-description]");
 const createForm = document.querySelector("[data-create-form]");
 const activeContainer = document.querySelector("[data-active-container]");
 const finishedContainer = document.querySelector("[data-finished-container]");
 
 function init() {
+    formElement.addEventListener("submit", async (event) => {
+        createTodo(event)
+        event.preventDefault()
+    })
     openCreateForm.addEventListener("click", () => toggleCreateForm())
     closeCreateForm.addEventListener("click", () => toggleCreateForm())
-    createButton.addEventListener("click", () => createTodo())
+    //createButton.addEventListener("click", () => createTodo())
     loadData()
 }
 
@@ -24,7 +27,7 @@ async function loadData() {
         const todos = resp.data
         todos.forEach(el => loadTodo(el))
     } catch (e) {
-        openErrorAlert("Fehler beim laden der Todos",e)
+        openErrorAlert("Fehler beim laden der Todos", e)
     }
 }
 
@@ -33,28 +36,29 @@ async function changeStatus(uuid) {
         const resp = await axiosInstance.put("/todos/" + uuid)
         loadTodo(resp.data)
     } catch (e) {
-        openErrorAlert("Fehler beim ändern des Todo-Status",e)
+        openErrorAlert("Fehler beim ändern des Todo-Status", e)
     }
 }
 
 async function deleteTodo(uuid) {
     try {
         await axiosInstance.delete("/todos/" + uuid)
-    }catch(e){
-        openErrorAlert("Fehler beim ändern des Passworts",e)
+    } catch (e) {
+        openErrorAlert("Fehler beim ändern des Passworts", e)
     }
 }
 
-async function createTodo() {
+async function createTodo(event) {
     try {
         const resp = await axiosInstance.post("/todos", { //Laut https://axios-http.com/docs/post_example die struktur
-            title: createTitle.value,
+            title: event.target[0].value,
             description: createDescription.value
         })
         loadTodo(resp.data)
-    }catch (e) {
-        openErrorAlert("Fehler beim erstellen des Todos",e)
+    } catch (error) {
+        openErrorAlert("Fehler beim erstellen des Todos", error)
     }
+    event.preventDefault()
 }
 
 //---- Normale Funktionen ----//
@@ -108,10 +112,11 @@ function toggleCreateForm() {
     }
 }
 
-function openErrorAlert(text,e) {
+function openErrorAlert(text, e) {
     errorAlert.className = "alert alert-danger p-1"
-    errorAlert.innerText = text+": "+e.response.status+" - "+e.response.statusText
+    errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
     errorAlert.removeAttribute("hidden")
 }
+
 //Aufruf von Init
 init()
