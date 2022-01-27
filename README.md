@@ -18,4 +18,4 @@ hierfür sind die links /docs und /redoc
 Um die Tests durchzuführen benutzen wir "pytest" hierzu für wir nur den Befehl "pytest" aus 
 und alle Tests aus files mit dem Namen \*\_test.py oder test_*.py werden ausgeführt
 
-Eine Beschreibung wie ein Plugin entwickelt wird befindet sich in der [Plugins Readme](py-api/plugins/README.md)
+Eine Beschreibung wie ein Plugin entwickelt wird befindet sich in der [Plugins Readme](https://ci02.inf.fh-flensburg.de/SE2VS2021_Gruppe6/server/blob/master/py_api/plugins/README.md)
