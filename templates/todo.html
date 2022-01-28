@@ -39,20 +39,19 @@
 <div id="createModal" class="modal fade" role="dialog">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
-            <form data-form id="createTodo">
+            <form data-form-create id="createTodo">
                 <div class="modal-header">
                     <h4 class="modal-title">ToDo erstellen</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <label class="m-0 mt-1"> Titel</label>
-                    <input data-create-title class="form-control" id="title" name=title required maxlength="128">
+                    <input class="form-control" id="title" name=title required maxlength="128">
                     <label class="m-0 mt-1">Beschreibung</label>
-                    <textarea data-create-description class="form-control" id="description"
+                    <textarea class="form-control" id="description"
                               name=description></textarea>
                 </div>
-                <div class="modal-footer justify-content-between">
-                    <button class="btn btn-warning mt-1">Schließen</button>
+                <div class="modal-footer justify-content-end">
                     <button class="btn btn-success mt-1 text-white" id="button" name=button
                             type="submit">Neues ToDo erstellen
                     </button>
@@ -61,6 +60,31 @@
         </div>
     </div>
 </div>
+<!--Modalfenster fürs Editieren von Todos -->
+<div id="editModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <form data-form-edit id="editTodo">
+                <div class="modal-header">
+                    <h4 class="modal-title">ToDo editieren</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input data-edit-uuid type="hidden" id="uuid">
+                    <label class="m-0 mt-1"> Titel</label>
+                    <input data-edit-title class="form-control" id="title" name=title required maxlength="128">
+                    <label class="m-0 mt-1">Beschreibung</label>
+                    <textarea data-edit-description class="form-control" id="description"
+                              name=description></textarea>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button class="btn btn-success mt-1 text-white"
+                            type="submit">Änderungen speichern
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 </body>
 </html>

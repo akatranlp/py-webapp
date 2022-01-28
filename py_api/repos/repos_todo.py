@@ -57,9 +57,17 @@ async def delete_todo(uuid: UUID, user: models_user.User):
 
 
 # Ein _Todo-Status ändern
-async def change_status_todo(uuid: UUID, user: models_user.User):
+async def change_status_todo(uuid: UUID, todo: schemas_todo.TodoPut, user: models_user.User):
     todo_obj = await _get_todo(uuid, user)
-    todo_obj.status = False if todo_obj.status else True # Invertiert den Status
+    if todo.toggle:  # Bei True wird er getoggled, bei false wird er nicht getoggled
+        todo_obj.status = False if todo_obj.status else True  # Invertiert den Status
+    if todo.title:
+        todo_obj.title = todo.title
+    elif todo.title == "":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail='missing_title')
+    if todo.description or todo.description=="":
+        todo_obj.description = todo.description
+
     await todo_obj.save()
     return await schemas_todo.TodoOut.from_tortoise_orm(todo_obj)
-
