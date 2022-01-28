@@ -6,9 +6,11 @@ const errorAlert = document.querySelector("[data-alert]");
 const editTitle = document.querySelector("[data-edit-title]");
 const editDescription = document.querySelector("[data-edit-description]");
 const editUUID = document.querySelector("[data-edit-uuid]");
-const editParent = document.querySelector("[data-edit-parent]");
 const activeContainer = document.querySelector("[data-active-container]");
 const finishedContainer = document.querySelector("[data-finished-container]");
+
+//Speichert die Referenz zum todoObject, welches gerade das Editieren Fenster geöffnet hat
+let toEditObject
 
 function init() {
     formCreate.addEventListener("submit", async (event) => {
@@ -24,7 +26,7 @@ function init() {
     })
     loadData()
 }
-
+//-- Funktionen mit Backendanfrage --//
 async function loadData() {
     //Wird beim Laden aufgerufen und gibt dem HTML alle Todos
     try {
@@ -49,15 +51,20 @@ async function changeStatus(uuid) {
 }
 
 async function changeTitleDescription(event) {
-    console.log(event)
+
     try {
         const resp = await axiosInstance.put("/todos/" + event.target[1].value, {
-            title: event.target[3].value,
-            description: event.target[4].value
+            title: event.target[2].value,
+            description: event.target[3].value
         })
-        updateTodoVisually(event.target[2].value, resp.data)
+        updateTodoVisually(resp.data)
     } catch (e) {
         openErrorAlert("Fehler beim Ändern des Todos", e)
+    }
+
+    function updateTodoVisually(newTodoData) {
+        toEditObject.children[0].innerHTML = newTodoData.title
+        toEditObject.children[1].innerHTML = newTodoData.description
     }
 }
 
@@ -85,8 +92,7 @@ async function createTodo(event) {
 //Lädt das To-Do 'curTodo'
 function loadTodo(curTodo) {
     //Generelles Objekt ------------------------------------------------------------------------------------------------
-    let todoObject
-    todoObject = document.createElement('div')
+    let todoObject = document.createElement('div')
     curTodo.status ? finishedContainer.appendChild(todoObject) : activeContainer.appendChild(todoObject)
     todoObject.className = "p-2 border border-info rounded highlight mb-1"
     // Titel -----------------------------------------------------------------------------------------------------------
@@ -118,13 +124,13 @@ function loadTodo(curTodo) {
     //Knopf zum Editieren ----------------------------------------------------------------------------------------------
     let buttonEdit = document.createElement('a')
     buttonEdit.className = "btn btn-info ml-2 text-white"
-    buttonEdit.setAttribute("data-toggle","modal")
-    buttonEdit.setAttribute("data-target","#editModal")
+    buttonEdit.setAttribute("data-toggle", "modal")
+    buttonEdit.setAttribute("data-target", "#editModal")
     buttonEdit.addEventListener("click", () => {
         editTitle.value = title.innerText
         editDescription.value = description.innerText
         editUUID.value = curTodo.uuid
-        editParent.value = todoObject
+        toEditObject = todoObject
     })
     buttonEdit.innerHTML = "Editieren"
     divEditButtons.appendChild(buttonEdit)
@@ -145,9 +151,6 @@ function loadTodo(curTodo) {
 
 }
 
-function updateTodoVisually(oldTodoObject, newTodoData) {
-    console.log(oldTodoObject)
-}
 
 function openErrorAlert(text, e) {
     errorAlert.className = "alert alert-danger p-1"
