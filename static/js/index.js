@@ -2,8 +2,6 @@ const navLoggedInElement = document.querySelector("[data-nav-loggedIn]");
 const navLoggedOutElement = document.querySelector("[data-nav-loggedOut]");
 const pluginsContainerElement = document.querySelector("[data-plugins-container]");
 
-let me;
-
 const getAccessToken = async () => {
     const resp = await axios.get('/refresh_token')
     return resp.data.token_type === 'bearer' ? resp.data.access_token : null
@@ -17,17 +15,26 @@ const getMe = async () => {
 
 const renderIsLoggedIn = async () => {
     try {
-        me = await getMe()
-        renderLoggedIn()
+        const me = await getMe()
+        renderLoggedIn(me)
     } catch (e) {
-        me = null
         renderLoggedOut()
     }
 }
 
-const renderLoggedIn = () => {
+const renderLoggedIn = (me) => {
     navLoggedOutElement.remove()
     navLoggedInElement.hidden = false
+
+    if (me.is_admin) {
+        const linkContainer = document.querySelector("[data-link-container]")
+        const usersLink = document.createElement("a")
+        usersLink.className = "btn btn-primary text-white mr-sm-2"
+        usersLink.innerText = "Users"
+        usersLink.href = "/user"
+
+        linkContainer.insertBefore(usersLink, linkContainer.querySelector(":first-child"))
+    }
     const meElement = document.querySelector("[data-me]");
     meElement.innerText = me.username
 }
@@ -48,14 +55,14 @@ const renderPlugins = async () => {
 
     plugins.forEach(plugin => {
         let routeElements = ''
-        for(const route of plugin.routes) {
+        for (const route of plugin.routes) {
             routeElements += `<li><a href="${route}">${route}</a></li>`
         }
 
         const pluginContainer = document.createElement('div');
         pluginContainer.innerHTML = `
         <h3>${plugin.name}</h3>
-        ${routeElements ? "<ul>"+routeElements+"</ul>" : ""}
+        ${routeElements ? "<ul>" + routeElements + "</ul>" : ""}
         `
         pluginsContainerElement.appendChild(pluginContainer);
     })
