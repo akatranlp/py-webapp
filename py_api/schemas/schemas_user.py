@@ -16,7 +16,6 @@ UserOut = pydantic_model_creator(models_user.User,
                                  name='UserOut',
                                  exclude_readonly=True,
                                  exclude=('password_hash',
-                                          'is_active',
                                           'token_version'))
 
 UserRegister = pydantic_model_creator(models_user.User,
