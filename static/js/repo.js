@@ -56,9 +56,12 @@ axiosInstance.interceptors.request.use(async req => {
 
 const init = async () => {
     const currentUser = await user.getMe()
+    if (!navbar)
+        return
     navbar.innerHTML = `
     <!-- Logindaten -->
     <div class="row pl-3">
+        <a class="btn btn-primary text-white mr-sm-2" href="/">Startseite</a>
         <a class="btn btn-danger text-white mr-sm-2" href="/logout">Ausloggen</a>
         <a class="btn btn-secondary text-white mr-sm-2" href="/account">Einstellungen</a>
         <div>
@@ -68,7 +71,8 @@ const init = async () => {
         </div>
     </div>
     <!-- Kalender und Adressbuch -->
-    <div data-nav-links-container>
+    <div>
+        ${currentUser.is_admin ? '<a class="btn btn-primary text-white mr-sm-2" href="/user">Users</a>' : ''}
         <a class="btn btn-primary text-white mr-sm-2" href="/">Startseite</a>
         <a class="btn btn-info mr-sm-2" href="/todo">ToDo-Liste</a>
         <a class="btn btn-success text-white mr-sm-2" href="/calendar">Kalender</a>

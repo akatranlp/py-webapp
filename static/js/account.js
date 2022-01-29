@@ -1,6 +1,6 @@
 import {user, axiosInstance} from "./repo.js";
 
-const changeButton = document.querySelector("[data-change-password-button]");
+const changePasswordForm = document.querySelector("[data-change-password-form]");
 const oldPassword = document.querySelector("[data-old-password]");
 const newPassword = document.querySelector("[data-new-password]");
 const newPassword2 = document.querySelector("[data-new-password-again]");
@@ -12,11 +12,12 @@ const deleteUserAlert = document.querySelector("[data-delete-user-alert]");
 
 function init() {
     deleteButton.addEventListener("click", () => deleteUser())
-    changeButton.addEventListener("click", () => changePassword())
+    changePasswordForm.addEventListener("submit", (e) => changePassword(e))
 }
 
-async function changePassword() {
-    if (newPassword !== newPassword2) {
+async function changePassword(e) {
+    e.preventDefault()
+    if (newPassword.value !== newPassword2.value) {
         passwordAlert.className = "alert alert-danger p-1"
         passwordAlert.innerText = "'Neues Passwort'-Eingaben stimmen nicht überein"
     } else {
@@ -27,6 +28,9 @@ async function changePassword() {
             })
             passwordAlert.className = "alert alert-success p-1"
             passwordAlert.innerText = "Passwort erfolgreich geändert"
+            oldPassword.value = ''
+            newPassword.value = ''
+            newPassword2.value = ''
 
         } catch (e) {
             passwordAlert.className = "alert alert-danger p-1"
@@ -46,6 +50,8 @@ async function changePassword() {
 }
 
 async function deleteUser() {
+    // TODO: vielleicht noch eine messagebox aufpoppen lassen
+    // ob man sich wirklich sicher ist
     try {
         await axiosInstance.delete("/users/" + currentUser.username)
         window.location.replace("/login")

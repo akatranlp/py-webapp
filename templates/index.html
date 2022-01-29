@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Hallo Welt</title>
-    <link href="{{ url_for('static', path='/css/index.css') }}" rel="stylesheet">
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -13,6 +12,7 @@
 <nav data-nav-loggedIn class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20" hidden>
     <!-- Logindaten -->
     <div class="row pl-3">
+        <a class="btn btn-primary text-white mr-sm-2" href="/">Startseite</a>
         <a class="btn btn-danger text-white mr-sm-2" href="/logout">Ausloggen</a>
         <a class="btn btn-secondary text-white mr-sm-2" href="/account">Einstellungen</a>
         <div>
@@ -22,7 +22,7 @@
         </div>
     </div>
     <!-- Kalender und Adressbuch -->
-    <div>
+    <div data-link-container>
         <a class="btn btn-info mr-sm-2" href="/todo">ToDo-Liste</a>
         <a class="btn btn-success text-white mr-sm-2" href="/calendar">Kalender</a>
         <a class="btn btn-warning mr-sm-2" href="/contact">Adressbuch</a>
@@ -30,6 +30,7 @@
 </nav>
 <nav data-nav-loggedOut class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20" hidden>
     <div class="row pl-3">
+        <a class="btn btn-primary text-white mr-sm-2" href="/">Startseite</a>
         <a class="loggedIn btn btn-light mr-sm-2" href="/login">Login</a>
         <a class="loggedIn btn btn-light mr-sm-2" href="/register">Register</a>
     </div>
