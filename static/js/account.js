@@ -50,6 +50,8 @@ async function changePassword(e) {
 }
 
 async function deleteUser() {
+    // TODO: vielleicht noch eine messagebox aufpoppen lassen
+    // ob man sich wirklich sicher ist
     try {
         await axiosInstance.delete("/users/" + currentUser.username)
         window.location.replace("/login")
