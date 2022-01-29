@@ -8,8 +8,7 @@ from .. import hashing
 async def get_all() -> List[schemas_user.UserOut]:
     user_list = []
     async for user_obj in models_user.User.all():
-        if user_obj.is_active:
-            user_list.append(await schemas_user.UserOut.from_tortoise_orm(user_obj))
+        user_list.append(await schemas_user.UserOut.from_tortoise_orm(user_obj))
     return user_list
 
 
