@@ -14,6 +14,14 @@ async def get_all(user: models_user.User) -> List[schemas_contact.ContactOut]:
 
 
 async def create_contact(contact: schemas_contact.ContactIn, user: models_user.User) -> schemas_contact.ContactOut:
+    exists = False
+    try:
+        await models_contact.Contact.get(email=contact.email, creator=user)
+        exists = True
+    except:
+        pass
+    if exists:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Existiert bereits')
     contact_obj = models_contact.Contact(
         name=contact.name,
         firstname=contact.firstname,
@@ -22,7 +30,7 @@ async def create_contact(contact: schemas_contact.ContactIn, user: models_user.U
     try:
         await contact_obj.save()
     except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Existiert bereits')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Fehler beim Speichern')
     return await schemas_contact.ContactOut.from_tortoise_orm(contact_obj)
 
 

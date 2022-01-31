@@ -6,5 +6,5 @@ from .models_helper import DBBaseModel
 class Contact(DBBaseModel, Model):
     name = fields.CharField(128)
     firstname = fields.CharField(128)
-    email = fields.CharField(50, unique=True)
+    email = fields.CharField(50)
     creator = fields.ForeignKeyField("models.User", related_name="contact")
