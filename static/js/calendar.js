@@ -1,6 +1,8 @@
 import {user, axiosInstance} from "./repo.js";
 
 const calenderDiv = document.getElementById("calenderContent")
+const participantsDiv = document.getElementById("participantsContent")
+const participantsButton = document.getElementById("addParticipant")
 const formElement = document.querySelector("[data-form]")
 
 async function f() {
@@ -47,7 +49,7 @@ async function createCalender() {
         let start = spilttetStart[0].split("-")
         let startYear = start[0].substring(1)
         let startMonth = start[1]
-        let startDay =start[2]
+        let startDay = start[2]
         let startHour = spilttetStart[1].split(":")[0]
         let startMinute = spilttetStart[1].split(":")[1]
 
@@ -60,11 +62,17 @@ async function createCalender() {
         let endHour = splittetEnd[1].split(":")[0]
         let endMinute = splittetEnd[1].split(":")[1]
 
+        let ort
+        if (element.location != "") {
+            ort = "Ort: " + element.location
+        } else {
+            ort = ""
+        }
 
         aItem.innerHTML = `
             <h1>${element.title}</h1> 
             <p>${element.description}</p>
-            <p>Ort: ${element.location}</p>
+            <p>${ort}</p>
             <p><b>von:</b> ${startDay}.${startMonth}.${startYear} - ${startHour}:${startMinute}<br>
             <b>bis:&nbsp;</b> ${endDay}.${endMonth}.${endYear} - ${endHour}:${endMinute}</p>`
 
@@ -82,16 +90,51 @@ async function createCalender() {
 
 }
 
+participantsButton.addEventListener("click", async (e) => {
+    const response = await axiosInstance.get("/contacts")
+    let contacts = await response.data
+
+
+    contacts.forEach((element, i) => {
+        const firstName = element.firstname
+        const lastName = element.name
+        const uuid = element.uuid
+
+        participantsDiv.innerHTML += ` 
+        <p>${firstName} ${lastName} <input type="checkbox" class="checkboxOfParticipants" name="klaus" value="${uuid}"></p>
+        `
+    })
+})
+
 formElement.addEventListener("submit", async (e) => {
     e.preventDefault()
+    const checkbox = document.getElementsByClassName("checkboxOfParticipants")
+
+    var user = []
+
+    for (var i = 0; i < checkbox.length; i++) {
+        if (checkbox[i].checked) {
+            user.push(checkbox[i].value)
+        }
+    }
+
+
+    const partic = user.map((user) => {
+        return {contact_uuid: user}
+    })
+
+
+    console.log(partic)
 
     let data = {
         "title": document.getElementById("Titel").value,
         "start_date": document.getElementById("Start").value,
         "end_date": document.getElementById("Ende").value,
         "description": document.getElementById("Beschreibung").value,
-        "location": document.getElementById("Ort").value
+        "location": document.getElementById("Ort").value,
+        "participants": partic
     }
+
     console.log(data)
     try {
         await axiosInstance.post("/events", data)
@@ -102,3 +145,4 @@ formElement.addEventListener("submit", async (e) => {
 })
 
 createCalender()
+

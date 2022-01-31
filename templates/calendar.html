@@ -30,9 +30,9 @@
 
 </div>
 <!--Modalfenster fürs Erstellen von Terminen -->
-<div id="createModal" class="modal fade" role="dialog">
+<div id="createModal" class="modal fade " role="dialog">
     <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
+        <div class="modal-content overflow-auto">
             <form action="" data-form method="post" class="form-container">
                 <div class="modal-header">
                     <h4 class="modal-title">Termin erstellen</h4>
@@ -53,11 +53,29 @@
 
                     <label for="Ort"><b>Ort</b></label>
                     <input type="text" name="location" id="Ort"><br>
+
+                </div>
+                <div class="modal-footer justify-content-start">
+                    <!-- j-c-b macht, dass die eine Gruppe links und die andere rechts ist-->
+                    <div>
+                        <button class="btn btn-primary" type="button" data-toggle="collapse"
+                                data-target="#collapse" aria-expanded="false" aria-controls="collapseExample" id="addParticipant">
+                            Personen Hinzufügen
+                        </button>
+                    </div>
+                    <div class="collapse w-75" id="collapse">
+                        <div>
+                            <h4>Personen Hinzufügen</h4>
+                            <div id="participantsContent">
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer justify-content-end">
                     <!-- j-c-b macht, dass die eine Gruppe links und die andere rechts ist-->
                     <div>
-                        <button id="createButton" type="submit" class="btn btn-primary mr-sm-2">
+                        <button id="createButton" type="submit" class="btn btn-success mr-sm-2">
                             Termin erstellen
                         </button>
                     </div>
