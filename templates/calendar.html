@@ -18,15 +18,18 @@
 <nav data-navbar class="navbar navbar-dark bg-dark container-fluid pl-20 pr-20"></nav>
 
 <div class="container mt-5">
-
     <h1>Termine</h1>
     <hr>
     <button class="btn btn-success mr-sm-2" type="button" data-toggle="modal"
             data-target="#createModal">Termin erstellen
     </button>
+    <button class="btn btn-success mr-sm-2" id="createEinladnung" type="button" data-toggle="modal"
+            data-target="#createEinladnungModal">Termin Einladungen
+    </button>
     <hr>
     <div id="calenderContent">
     </div>
+
 
 </div>
 <!--Modalfenster fürs Erstellen von Terminen -->
@@ -59,7 +62,8 @@
                     <!-- j-c-b macht, dass die eine Gruppe links und die andere rechts ist-->
                     <div>
                         <button class="btn btn-primary" type="button" data-toggle="collapse"
-                                data-target="#collapse" aria-expanded="false" aria-controls="collapseExample" id="addParticipant">
+                                data-target="#collapse" aria-expanded="false" aria-controls="collapseExample"
+                                id="addParticipant">
                             Personen Hinzufügen
                         </button>
                     </div>
@@ -85,6 +89,25 @@
 
     </div>
 </div>
+
+<div id="createEinladnungModal" class="modal fade " role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content overflow-auto">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Einladungen</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="invitesContent">
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-end">
+                </div>
+        </div>
+
+    </div>
 </div>
 </body>
 </html>
