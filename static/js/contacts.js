@@ -47,12 +47,11 @@ const loadData = async () => {
                     openErrorAlert(error.response.data.detail, error)
                 }
             })
-
+            row.appendChild(contactName)
+            row.appendChild(contactFirstname)
+            row.appendChild(contactEmail)
+            row.appendChild(deleteButton)
             tableElement.appendChild(row)
-            tableElement.appendChild(contactName)
-            tableElement.appendChild(contactFirstname)
-            tableElement.appendChild(contactEmail)
-            tableElement.appendChild(deleteButton)
         })
     } catch (error) {
         openErrorAlert("Fehler beim laden der Daten", error)

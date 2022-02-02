@@ -5,25 +5,48 @@ const usersContainerElement = document.querySelector("[data-user-container]");
 const getAllUsers = async () => {
     usersContainerElement.innerHTML = ''
     const resp = await axiosInstance.get('/users')
-
+    // Table erstellen mit Header
+    const table = document.createElement('table')
+    const tableHeader = document.createElement('thead')
+    table.appendChild(tableHeader)
+    const tableHeaderRow = document.createElement('tr')
+    tableHeader.appendChild(tableHeaderRow)
+    {
+        const tableHead = document.createElement('th')
+        tableHead.innerText = "Name"
+        tableHeaderRow.appendChild(tableHead)
+    }
+    {
+        const tableHead = document.createElement('th')
+        tableHead.innerText = "E-Mail"
+        tableHeaderRow.appendChild(tableHead)
+    }
+    {
+        const tableHead = document.createElement('th')
+        tableHead.innerText = "Einstellungen"
+        tableHeaderRow.appendChild(tableHead)
+    }
+    const tableBody = document.createElement('tbody')
+    table.appendChild(tableBody)
     resp.data.forEach(user => {
-        const userContainer = document.createElement('div');
-
+        const userRow = document.createElement('tr');
+        //userRow.className = "d-flex flex-row justify-content-between p-1 border border-info rounded highlight mb-1"
         {
-            const tempElement = document.createElement('p');
-            tempElement.innerText = user.username
-            userContainer.appendChild(tempElement)
+            const nameElement = document.createElement('td');
+            nameElement.innerText = user.username
+            userRow.appendChild(nameElement)
         }
         {
-            const tempElement = document.createElement('p');
-            tempElement.innerText = user.email
-            userContainer.appendChild(tempElement)
+            const emailElement = document.createElement('td');
+            emailElement.innerText = user.email
+            userRow.appendChild(emailElement)
         }
-
+        const buttonElement = document.createElement('td');
+        userRow.appendChild(buttonElement)
         const isActiveBtn = document.createElement('button');
         isActiveBtn.className = `btn text-white mr-sm-2 ${user.is_active ? "btn-danger" : "btn-success"}`
         isActiveBtn.innerText = user.is_active ? 'Deactivate' : 'Reactivate'
-        userContainer.appendChild(isActiveBtn);
+        buttonElement.appendChild(isActiveBtn);
 
         isActiveBtn.addEventListener('click', async () => {
             const is_active = !user.is_active
@@ -39,7 +62,7 @@ const getAllUsers = async () => {
         const isAdminBtn = document.createElement('button');
         isAdminBtn.className = `btn text-white mr-sm-2 ${user.is_admin ? "btn-danger" : "btn-success"}`
         isAdminBtn.innerText = user.is_admin ? 'Demote' : 'Promote'
-        userContainer.appendChild(isAdminBtn);
+        buttonElement.appendChild(isAdminBtn);
 
         isAdminBtn.addEventListener('click', async () => {
             const is_admin = !user.is_admin
@@ -55,7 +78,7 @@ const getAllUsers = async () => {
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn text-white mr-sm-2 btn-danger'
         deleteBtn.innerText = 'Delete'
-        userContainer.appendChild(deleteBtn);
+        buttonElement.appendChild(deleteBtn);
 
         deleteBtn.addEventListener('click', async () => {
             // TODO: Popup ob man wirklich den User löschen möchte
@@ -67,8 +90,9 @@ const getAllUsers = async () => {
             }
         })
 
-        usersContainerElement.appendChild(userContainer);
+        tableBody.appendChild(userRow);
     })
+    usersContainerElement.appendChild(table);
 }
 
 
