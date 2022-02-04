@@ -11,7 +11,17 @@ const deleteButton = document.querySelector("[data-delete-user-button]");
 const deleteUserAlert = document.querySelector("[data-delete-user-alert]");
 
 const init = () => {
-    deleteButton.addEventListener("click", () => deleteUser())
+    deleteButton.addEventListener("click", async () => {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn text-white mr-sm-2 btn-dark'
+        deleteBtn.innerText = 'Sicher?'
+        deleteButton.parentNode.appendChild(deleteBtn);
+
+        deleteBtn.addEventListener('click', async () => {
+            await deleteUser()
+        })
+        deleteButton.remove()
+    })
     changePasswordForm.addEventListener("submit", async (e) => changePassword(e))
 }
 
