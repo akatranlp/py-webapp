@@ -1,6 +1,7 @@
 import {user, axiosInstance} from "./repo.js";
 
 const usersContainerElement = document.querySelector("[data-user-container]");
+const errorAlert = document.querySelector("[data-alert]");
 
 const getUserElement = (user) => {
     const userRow = document.createElement('tr');
@@ -33,10 +34,11 @@ const getUserElement = (user) => {
             const resp = await axiosInstance.put('/users/' + user.username, {is_admin})
             const newUserRow = getUserElement(resp.data)
 
+            closeErrorAlertIfThere()
             usersContainerElement.insertBefore(newUserRow, userRow)
             userRow.remove()
         } catch (e) {
-            alert(e)
+            openErrorAlert(e.response.data.detail, e)
         }
     })
 
@@ -52,10 +54,11 @@ const getUserElement = (user) => {
             const resp = await axiosInstance.put('/users/' + user.username, {is_active})
             const newUserRow = getUserElement(resp.data)
 
+            closeErrorAlertIfThere()
             usersContainerElement.insertBefore(newUserRow, userRow)
             userRow.remove()
         } catch (e) {
-            alert(e)
+            openErrorAlert(e.response.data.detail, e)
         }
     })
 
@@ -73,9 +76,10 @@ const getUserElement = (user) => {
         deleteBtn.addEventListener('click', async () => {
             try {
                 await axiosInstance.delete('/users/' + user.username)
+                closeErrorAlertIfThere()
                 userRow.remove()
             } catch (e) {
-                alert(e)
+                openErrorAlert(e.response.data.detail, e)
             }
         })
         deleteBtnPre.remove()
@@ -99,5 +103,20 @@ const init = async () => {
 
     await getAllUsers()
 }
+
+const openErrorAlert = (text, e) => {
+    errorAlert.className = "alert alert-danger p-1"
+    if (e !== null) {
+        errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
+    } else {
+        errorAlert.innerText = text
+    }
+    errorAlert.removeAttribute("hidden")
+}
+
+const closeErrorAlertIfThere = () => {
+    errorAlert.setAttribute("hidden", "")
+}
+
 
 init()
