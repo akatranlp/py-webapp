@@ -40,6 +40,8 @@ async def event_participant_in_to_model(event_participant: schemas_event.EventPa
 
 
 async def create_event(event: schemas_event.EventIn, user: models_user.User) -> schemas_event.EventOut:
+    if event.start_date > event.end_date:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Start Datum muss vor Enddatum sein')
     event_obj = models_event.Event(
         title=event.title,
         start_date=event.start_date,
@@ -94,6 +96,9 @@ async def change_event(uuid: UUID, event: schemas_event.EventPut, user: models_u
         event_obj.description = event.description
     if event.location:
         event_obj.location = event.location
+
+    if event_obj.start_date > event_obj.end_date:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Start Datum muss vor Enddatum sein')
 
     await event_obj.save()
     return await schemas_event.EventOut.from_model(event_obj)
