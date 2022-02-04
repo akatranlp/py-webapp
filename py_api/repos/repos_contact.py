@@ -2,7 +2,7 @@ from typing import List
 from uuid import UUID
 from fastapi import HTTPException, status
 from ..schemas import schemas_contact
-from ..models import models_contact, models_user
+from ..models import models_contact, models_user, models_event
 
 
 async def get_all(user: models_user.User) -> List[schemas_contact.ContactOut]:
@@ -20,7 +20,7 @@ async def create_contact(contact: schemas_contact.ContactIn, user: models_user.U
     except:
         pass
     if exists:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Existiert bereits')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email existiert bereits')
     contact_obj = models_contact.Contact(
         name=contact.name,
         firstname=contact.firstname,
@@ -46,14 +46,40 @@ async def get_contact(uuid: UUID, user: models_user.User):
 
 async def change_contact(uuid: UUID, contact: schemas_contact.ContactPut, user: models_user.User):
     contact_obj = await _get_contact(uuid, user)
+    already_saved = False
+    if contact.email:
+        exists = False
+        try:
+            await models_contact.Contact.get(email=contact.email, creator=user)
+            exists = True
+        except:
+            pass
+        if exists:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email existiert bereits')
+        contact_obj.email = contact.email
+
+        await contact_obj.save()
+        already_saved = True
+        async for event_participants in models_event.EventParticipant.filter(contact=contact_obj):
+            try:
+                user_obj = await models_user.User.get(email=contact_obj.email)
+            except:
+                user_obj = None
+            if user_obj:
+                status_obj = await models_event.EventParticipantStatus.get(status="Pending")
+            else:
+                status_obj = await models_event.EventParticipantStatus.get(status="Accepted")
+            event_participants.user = user_obj
+            event_participants.status = status_obj
+            await event_participants.save()
+
     if contact.name:
         contact_obj.name = contact.name
     if contact.firstname:
         contact_obj.firstname = contact.firstname
-    if contact.email:
-        contact_obj.email = contact.email
 
-    await contact_obj.save()
+    if not already_saved:
+        await contact_obj.save()
     return await schemas_contact.ContactOut.from_tortoise_orm(contact_obj)
 
 
