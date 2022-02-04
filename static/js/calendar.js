@@ -12,6 +12,8 @@ const endElement = document.getElementById("Ende")
 const descriptionElement = document.getElementById("Beschreibung")
 const locationElement = document.getElementById("Ort")
 
+const errorAlert = document.querySelector("[data-alert]");
+
 
 const getCalenderElement = (event, me) => {
     const calenderElement = document.createElement('div');
@@ -66,9 +68,10 @@ const getCalenderElement = (event, me) => {
             btn.addEventListener("click", async () => {
                 try {
                     await axiosInstance.delete(`/events/${event.uuid}/entries/${participant.contact_uuid}`)
+                    closeErrorAlertIfThere()
                     userDiv.remove()
                 } catch (e) {
-                    alert(e)
+                    openErrorAlert(e.response.data.detail, e)
                 }
             })
             userDiv.appendChild(btn)
@@ -88,8 +91,9 @@ const getCalenderElement = (event, me) => {
                 await axiosInstance.put(`/invitations/${event.uuid}`, {status_id: 3})
                 calenderElement.remove()
             }
+            closeErrorAlertIfThere()
         } catch (e) {
-            alert(e)
+            openErrorAlert(e.response.data.detail, e)
         }
     })
     calenderElement.appendChild(btn)
@@ -197,13 +201,28 @@ const init = async () => {
             descriptionElement.value = ''
             locationElement.value = ''
             $('#createModal').modal('hide');
+            closeErrorAlertIfThere()
         } catch (e) {
-            console.log(e)
-            alert(e.response.data.detail)
+            openErrorAlert(e.response.data.detail, e)
         }
     })
 
     await createCalender(me)
 }
+
+const openErrorAlert = (text, e) => {
+    errorAlert.className = "alert alert-danger p-1"
+    if (e !== null) {
+        errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
+    } else {
+        errorAlert.innerText = text
+    }
+    errorAlert.removeAttribute("hidden")
+}
+
+const closeErrorAlertIfThere = () => {
+    errorAlert.setAttribute("hidden", "")
+}
+
 
 init()
