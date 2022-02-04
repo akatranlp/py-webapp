@@ -1,6 +1,5 @@
 from typing import List
 from uuid import UUID
-
 from fastapi import Depends
 from ..schemas import schemas_contact
 from ..models import models_user
