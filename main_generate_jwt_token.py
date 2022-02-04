@@ -28,9 +28,9 @@ def main():
 
     if jwt_secret is None:
         needed_keys = ['JWT_ACCESS_TOKEN_SECRET']
-        if not config.validate_needed_keys(needed_keys):
+        if not config.Config.get_instance().validate_needed_keys(needed_keys):
             raise Exception('not all Keys are there')
-        jwt_secret = config.get_config_value('JWT_ACCESS_TOKEN_SECRET')
+        jwt_secret = config.Config.get_instance().get_config_value('JWT_ACCESS_TOKEN_SECRET')
 
     print(create_jwt_token(my_args.id, jwt_secret))
     sys.exit(0)
