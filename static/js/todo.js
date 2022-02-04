@@ -12,19 +12,19 @@ const finishedContainer = document.querySelector("[data-finished-container]");
 //Speichert die Referenz zum todoObject, welches gerade das Editieren Fenster geöffnet hat
 let toEditObject
 
-function init() {
+async function init() {
     formCreate.addEventListener("submit", async (event) => {
         event.preventDefault()
-        createTodo(event)
+        await createTodo(event)
         $('#createModal').modal('hide'); //Bisschen JQuery für Bootstrap Modal, da das auf JQuery basiert
     })
     formEdit.addEventListener("submit", async (event) => {
         event.preventDefault()
-        changeTitleDescription(event)
+        await changeTitleDescription(event)
         $('#editModal').modal('hide'); //Bisschen JQuery für Bootstrap Modal, da das auf JQuery basiert
 
     })
-    loadData()
+    await loadData()
 }
 //-- Funktionen mit Backendanfrage --//
 async function loadData() {
