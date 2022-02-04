@@ -53,6 +53,21 @@ In Kombination mit den Templates wird die "url_for" Funktion wie folgt genutzt.
 <script src="{{ url_for('{PLUGIN_NAME}', path='/js/index.js') }}"></script>
 ```
 
+Falls eine Seite nur erreichbar sein soll, wenn der User eingeloggt ist, dann ist entweder die repo.js als module zu importieren:
+```html
+<script src="{{ url_for('static', path='/js/repo.js') }}" type="module"></script>
+```
+
+Alternativ kann man diese in ein eigenes plugin-repo importieren und mit weiteren oder alternativen exports für das eigene
+Plugin erweitern. Das könnte zum Beispiel so aussehen:
+```javascript
+import {user as baseUser, axiosInstance as baseAxiosInstance} from '/static/js/repo.js'
+
+export const user = baseUser
+export const axiosInstance = baseAxiosInstance
+export const apiBaseUrl = '/plugin/{PLUGIN_NAME}/api'
+```
+
 ## Endpoints
 Template Endpunkte sollten "include_in_schema=False" beim Erstellen benutzen, damit sie nicht in der API-Doku
 auftauchen. Damit man dann doch die URl des Plugins findet, ist ein Endpunkt in der Main-App vorhanden, welcher

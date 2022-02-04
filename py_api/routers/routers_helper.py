@@ -1,12 +1,11 @@
 from typing import Any, Callable
-
 from fastapi import APIRouter as FastAPIRouter
 from fastapi.types import DecoratedCallable
 
 
 class APIRouter(FastAPIRouter):
     def api_route(
-        self, path: str, *, include_in_schema: bool = True, **kwargs: Any
+            self, path: str, *, include_in_schema: bool = True, **kwargs: Any
     ) -> Callable[[DecoratedCallable], DecoratedCallable]:
         if path.endswith("/"):
             path = path[:-1]

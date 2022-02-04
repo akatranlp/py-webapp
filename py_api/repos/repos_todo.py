@@ -1,6 +1,5 @@
 from typing import List, Optional
 from uuid import UUID
-
 from fastapi import HTTPException, status
 from ..schemas import schemas_todo
 from ..models import models_todo
@@ -65,8 +64,8 @@ async def change_status_todo(uuid: UUID, todo: schemas_todo.TodoPut, user: model
         todo_obj.title = todo.title
     elif todo.title == "":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail='missing_title')
-    if todo.description or todo.description=="":
+                            detail='missing_title')
+    if todo.description or todo.description == "":
         todo_obj.description = todo.description
 
     await todo_obj.save()

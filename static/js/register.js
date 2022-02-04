@@ -14,7 +14,7 @@ formElement.addEventListener("submit", async (e) => {
     const password2 = password2Element.value
     if (password_hash === password2) {
         try {
-            const response = await axios.post("/users", {username, password_hash, email})
+            await axios.post("/users", {username, password_hash, email})
             window.location = "/login"
         } catch (error) {
             openErrorAlert(error.response.data.detail, error)
@@ -28,7 +28,7 @@ const openErrorAlert = (text, e) => {
     errorAlert.className = "alert alert-danger p-1"
     if (e !== null) {
         errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
-    }else {
+    } else {
         errorAlert.innerText = text
     }
     errorAlert.removeAttribute("hidden")

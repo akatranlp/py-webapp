@@ -184,8 +184,9 @@ def test_read_users_again(client: TestClient, admin_user: dict):
 
     response = client.get('/users', headers=headers)
     assert response.status_code == 200
-    assert response.json() == [{'email': 'test@test.com', 'username': 'Test', 'is_admin': False},
-                               {'email': 'admin@test.com', 'username': 'adminTest', 'is_admin': True}]
+    assert response.json() == [{'email': 'test@test.com', 'username': 'Test', 'is_admin': False, 'is_active': True},
+                               {'email': 'admin@test.com', 'username': 'adminTest', 'is_admin': True,
+                                'is_active': True}]
 
 
 def test_unauthorized(client: TestClient):
@@ -213,7 +214,7 @@ def test_me(client: TestClient, test_user: dict):
     response = client.get('/users/me', headers=headers)
     assert response.status_code == 200
     assert response.json() == {'username': test_user['username'], 'email': test_user['email'],
-                               'is_admin': test_user['is_admin']}
+                               'is_admin': test_user['is_admin'], 'is_active': True}
     client.cookies.clear_session_cookies()
 
 
@@ -259,7 +260,7 @@ def test_get_user(client: TestClient, test_user: dict, admin_user: dict):
 
     response = client.get('/users/adminTest', headers=headers)
     assert response.status_code == 200
-    assert response.json() == {'email': 'admin@test.com', 'username': 'adminTest', 'is_admin': True}
+    assert response.json() == {'email': 'admin@test.com', 'username': 'adminTest', 'is_admin': True, 'is_active': True}
     client.cookies.clear_session_cookies()
 
 
@@ -340,10 +341,6 @@ def test_index_template(client: TestClient):
     response = client.get('/static/js/index.js')
     assert response.status_code == 200
     assert response.headers['content-type'] == 'application/javascript'
-
-    response = client.get('/static/css/index.css')
-    assert response.status_code == 200
-    assert response.headers['content-type'] == 'text/css; charset=utf-8'
 
 
 def test_get_events(client: TestClient, test_user: dict):

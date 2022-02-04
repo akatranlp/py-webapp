@@ -15,43 +15,46 @@ formElement.addEventListener("submit", async (e) => {
 
     try {
         const response = await axiosInstance.post("/contacts", {name, firstname, email})
-        console.log(response)
-        window.location = "/contact"
+        tableElement.appendChild(getContactElement(response.data))
     } catch (error) {
         openErrorAlert(error.response.data.detail, error)
     }
 })
+
+const getContactElement = (contact) => {
+    const row = document.createElement("tr")
+    const contactName = document.createElement("td")
+    contactName.innerHTML = contact.name
+    const contactFirstname = document.createElement("td")
+    contactFirstname.innerHTML = contact.firstname
+    const contactEmail = document.createElement("td")
+    contactEmail.innerHTML = contact.email
+    contactEmail.className = "text-wrap text-break"
+
+    const deleteButton = document.createElement("button")
+    deleteButton.innerHTML = "Nutzer entfernen"
+    deleteButton.className = "btn btn-danger mr-sm-2"
+    deleteButton.addEventListener("click", async (event) => {
+        try {
+            await axiosInstance.delete("/contacts/" + contact.uuid)
+            row.remove()
+        } catch (error) {
+            openErrorAlert(error.response.data.detail, error)
+        }
+    })
+    row.appendChild(contactName)
+    row.appendChild(contactFirstname)
+    row.appendChild(contactEmail)
+    row.appendChild(deleteButton)
+    return row
+}
 
 const loadData = async () => {
     try {
         const response = await axiosInstance.get("/contacts")
         const contacts = response.data
         contacts.forEach(element => {
-            const row = document.createElement("tr")
-            const contactName = document.createElement("td")
-            contactName.innerHTML = element.name
-            const contactFirstname = document.createElement("td")
-            contactFirstname.innerHTML = element.firstname
-            const contactEmail = document.createElement("td")
-            contactEmail.innerHTML = element.email
-            contactEmail.className = "text-wrap text-break"
-
-            const deleteButton = document.createElement("button")
-            deleteButton.innerHTML = "Nutzer entfernen"
-            deleteButton.className = "btn btn-danger mr-sm-2"
-            deleteButton.addEventListener("click", async (event) => {
-                try {
-                    await axiosInstance.delete("/contacts/" + element.uuid)
-                    window.location = "/contact"
-                } catch (error) {
-                    openErrorAlert(error.response.data.detail, error)
-                }
-            })
-            row.appendChild(contactName)
-            row.appendChild(contactFirstname)
-            row.appendChild(contactEmail)
-            row.appendChild(deleteButton)
-            tableElement.appendChild(row)
+            tableElement.appendChild(getContactElement(element))
         })
     } catch (error) {
         openErrorAlert("Fehler beim laden der Daten", error)

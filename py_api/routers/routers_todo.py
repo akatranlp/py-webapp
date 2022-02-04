@@ -1,6 +1,5 @@
 from typing import List, Optional
 from uuid import UUID
-
 from fastapi import Depends
 from .. import oauth2
 from ..schemas import schemas_user
