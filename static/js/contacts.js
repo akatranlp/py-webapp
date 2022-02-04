@@ -7,6 +7,15 @@ const nameElement = document.querySelector("[data-name]")
 const firstnameElement = document.querySelector("[data-firstname]")
 const emailElement = document.querySelector("[data-email]")
 
+const formEditElement = document.querySelector("[data-edit-form]")
+const nameEditElement = document.querySelector("[data-edit-name]")
+const firstnameEditElement = document.querySelector("[data-edit-firstname]")
+const emailEditElement = document.querySelector("[data-edit-email]")
+
+const uuidEditElement = document.querySelector("[data-edit-uuid]");
+
+let editContactElement;
+
 formElement.addEventListener("submit", async (e) => {
     e.preventDefault()
     const name = nameElement.value
@@ -16,6 +25,32 @@ formElement.addEventListener("submit", async (e) => {
     try {
         const response = await axiosInstance.post("/contacts", {name, firstname, email})
         tableElement.appendChild(getContactElement(response.data))
+        nameElement.value = ''
+        firstnameElement.value = ''
+        emailElement.value = ''
+        $('#createModal').modal('hide')
+    } catch (error) {
+        openErrorAlert(error.response.data.detail, error)
+    }
+})
+
+formEditElement.addEventListener("submit", async (e) => {
+    e.preventDefault()
+    const uuid = uuidEditElement.value
+    const name = nameEditElement.value
+    const firstname = firstnameEditElement.value
+    const email = emailEditElement.value
+
+    try {
+        const response = await axiosInstance.put(`/contacts/${uuid}`, {name, firstname, email})
+        const newContactElement = getContactElement(response.data)
+
+        uuidEditElement.value = ''
+        nameEditElement.value = ''
+        firstnameEditElement.value = ''
+        emailEditElement.value = ''
+        $('#editModal').modal('hide')
+        editContactElement.parentNode.replaceChild(newContactElement, editContactElement)
     } catch (error) {
         openErrorAlert(error.response.data.detail, error)
     }
@@ -31,6 +66,19 @@ const getContactElement = (contact) => {
     contactEmail.innerHTML = contact.email
     contactEmail.className = "text-wrap text-break"
 
+    const changeButton = document.createElement("button")
+    changeButton.innerHTML = "Nutzer bearbeiten"
+    changeButton.className = "btn btn-success mr-sm-2"
+    changeButton.setAttribute("data-toggle", "modal")
+    changeButton.setAttribute("data-target", "#editModal")
+    changeButton.addEventListener("click", async (event) => {
+        uuidEditElement.value = contact.uuid
+        nameEditElement.value = contact.name
+        firstnameEditElement.value = contact.firstname
+        emailEditElement.value = contact.email
+        editContactElement = row
+    })
+
     const deleteButton = document.createElement("button")
     deleteButton.innerHTML = "Nutzer entfernen"
     deleteButton.className = "btn btn-danger mr-sm-2"
@@ -45,6 +93,7 @@ const getContactElement = (contact) => {
     row.appendChild(contactName)
     row.appendChild(contactFirstname)
     row.appendChild(contactEmail)
+    row.appendChild(changeButton)
     row.appendChild(deleteButton)
     return row
 }

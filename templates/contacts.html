@@ -74,6 +74,38 @@
         </tbody>
     </table>
 </div>
+<div id="editModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <form data-edit-form class="form-container" action="" method="post">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Kontakt bearbeiten</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <input data-edit-uuid type="hidden">
+                            <label for="editName"></label><input data-edit-name type="text" class="form-control"
+                                                             placeholder="Nachname" id="editName" name=name
+                                                             maxlength="25" required>
 
+                            <label for="editFirstname"></label><input data-edit-firstname type="text" class="form-control"
+                                                                  placeholder="Vorname" id="editFirstname"
+                                                                  name=firstname maxlength="25" required>
+
+                            <label for="editEmail"></label><input data-edit-email type="email" class="form-control"
+                                                              placeholder="Email" id="editEmail"
+                                                              name=email maxlength="50" required>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <div>
+                                <button id="editButton" type="submit" class="btn btn-primary mr-sm-2">
+                                    Kontakt bearbeiten
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 </body>
 </html>
