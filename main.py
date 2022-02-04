@@ -90,7 +90,7 @@ async def favicon():
 
 register_tortoise(
     app,
-    db_url=Config.get_instance().get_config_value('DATABASE_URL', 'sqlite://db.sqlite3'),
+    db_url=Config.get_instance().get_config_value('DATABASE_URL', 'sqlite://files/db.sqlite3'),
     modules={'models': models},
     generate_schemas=True,
     add_exception_handlers=True,
