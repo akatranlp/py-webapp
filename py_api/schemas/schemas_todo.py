@@ -1,5 +1,4 @@
 from typing import Optional
-
 from tortoise.contrib.pydantic import pydantic_model_creator
 from pydantic import BaseModel, Extra
 from ..models import models_todo
