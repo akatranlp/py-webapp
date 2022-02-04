@@ -10,12 +10,12 @@ const passwordAlert = document.querySelector("[data-password-alert]");
 const deleteButton = document.querySelector("[data-delete-user-button]");
 const deleteUserAlert = document.querySelector("[data-delete-user-alert]");
 
-function init() {
+const init = () => {
     deleteButton.addEventListener("click", () => deleteUser())
-    changePasswordForm.addEventListener("submit", (e) => changePassword(e))
+    changePasswordForm.addEventListener("submit", async (e) => changePassword(e))
 }
 
-async function changePassword(e) {
+const changePassword = async (e) => {
     e.preventDefault()
     if (newPassword.value !== newPassword2.value) {
         passwordAlert.className = "alert alert-danger p-1"
@@ -49,7 +49,7 @@ async function changePassword(e) {
     passwordAlert.removeAttribute("hidden")
 }
 
-async function deleteUser() {
+const deleteUser = async () => {
     // TODO: vielleicht noch eine messagebox aufpoppen lassen
     // ob man sich wirklich sicher ist
     const currentUser = await user.getMe()

@@ -12,7 +12,7 @@ const finishedContainer = document.querySelector("[data-finished-container]");
 //Speichert die Referenz zum todoObject, welches gerade das Editieren Fenster geöffnet hat
 let toEditObject
 
-async function init() {
+const init = async () => {
     formCreate.addEventListener("submit", async (event) => {
         event.preventDefault()
         await createTodo(event)
@@ -27,7 +27,7 @@ async function init() {
     await loadData()
 }
 //-- Funktionen mit Backendanfrage --//
-async function loadData() {
+const loadData = async () => {
     //Wird beim Laden aufgerufen und gibt dem HTML alle Todos
     try {
         const resp = await axiosInstance.get("/todos")
@@ -38,7 +38,7 @@ async function loadData() {
     }
 }
 
-async function changeStatus(uuid) {
+const changeStatus = async (uuid) => {
     try {
         const resp = await axiosInstance.put("/todos/" + uuid, {
             toggle: true
@@ -50,25 +50,21 @@ async function changeStatus(uuid) {
     }
 }
 
-async function changeTitleDescription(event) {
+const changeTitleDescription = async (event) => {
 
     try {
         const resp = await axiosInstance.put("/todos/" + event.target[1].value, {
             title: event.target[2].value,
             description: event.target[3].value
         })
-        updateTodoVisually(resp.data)
+        toEditObject.children[0].innerHTML = resp.data.title
+        toEditObject.children[1].innerHTML = resp.data.description
     } catch (e) {
         openErrorAlert("Fehler beim Ändern des Todos", e)
     }
-
-    function updateTodoVisually(newTodoData) {
-        toEditObject.children[0].innerHTML = newTodoData.title
-        toEditObject.children[1].innerHTML = newTodoData.description
-    }
 }
 
-async function deleteTodo(uuid) {
+const deleteTodo = async (uuid) => {
     try {
         await axiosInstance.delete("/todos/" + uuid)
     } catch (e) {
@@ -76,7 +72,7 @@ async function deleteTodo(uuid) {
     }
 }
 
-async function createTodo(event) {
+const createTodo = async (event) => {
     try {
         const resp = await axiosInstance.post("/todos", { //Laut https://axios-http.com/docs/post_example die struktur
             title: event.target[1].value,
@@ -90,7 +86,7 @@ async function createTodo(event) {
 
 //---- Normale Funktionen ----//
 //Lädt das To-Do 'curTodo'
-function loadTodo(curTodo) {
+const loadTodo = (curTodo) => {
     //Generelles Objekt ------------------------------------------------------------------------------------------------
     let todoObject = document.createElement('div')
     curTodo.status ? finishedContainer.appendChild(todoObject) : activeContainer.appendChild(todoObject)
@@ -151,8 +147,7 @@ function loadTodo(curTodo) {
 
 }
 
-
-function openErrorAlert(text, e) {
+const openErrorAlert = (text, e) => {
     errorAlert.className = "alert alert-danger p-1"
     errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
     errorAlert.removeAttribute("hidden")
