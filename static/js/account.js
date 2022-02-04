@@ -22,7 +22,7 @@ async function changePassword(e) {
         passwordAlert.innerText = "'Neues Passwort'-Eingaben stimmen nicht überein"
     } else {
         try {
-            const resp = await axiosInstance.put("/change_password", {
+            await axiosInstance.put("/change_password", {
                 old_password: oldPassword.value,
                 new_password: newPassword.value
             })
