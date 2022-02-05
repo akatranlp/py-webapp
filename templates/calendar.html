@@ -90,6 +90,51 @@
     </div>
 </div>
 
+<!--Modalfenster fürs Erstellen von Terminen -->
+<div id="editModal" class="modal fade " role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content overflow-auto">
+            <form action="" data-form-edit method="post" class="form-container">
+                <div class="modal-header">
+                    <h4 class="modal-title">Termin verändern</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input data-edit-uuid type="hidden">
+                    <label for="edit-Titel"><b>Titel</b></label>
+                    <input type="text" name="title" id="edit-Titel" required><br>
+
+                    <label for="edit-Start"><b>Start Datum</b></label>
+                    <input type="datetime-local" name="start_date" id="edit-Start" max="2100-01-01T00:00" required><br>
+
+                    <label for="edit-Ende"><b>End Datum</b></label>
+                    <input type="datetime-local" name="end_date" id="edit-Ende" max="2100-01-01T00:00" required><br>
+
+                    <label for="edit-Beschreibung"><b>Beschreibung</b></label>
+                    <input type="text" name="description" id="edit-Beschreibung"><br>
+
+                    <label for="edit-Ort"><b>Ort</b></label>
+                    <input type="text" name="location" id="edit-Ort"><br>
+
+                </div>
+                <div class="modal-footer justify-content-start">
+                    <!-- j-c-b macht, dass die eine Gruppe links und die andere rechts ist-->
+
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <!-- j-c-b macht, dass die eine Gruppe links und die andere rechts ist-->
+                    <div>
+                        <button id="createButton" type="submit" class="btn btn-success mr-sm-2">
+                            Termin verändern
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
 <div id="createEinladungModal" class="modal fade " role="dialog">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content overflow-auto">

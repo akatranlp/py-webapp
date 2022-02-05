@@ -14,6 +14,16 @@ const inviteCount = document.querySelector("[data-invite-count]")
 
 const errorAlert = document.querySelector("[data-alert]");
 
+const editTitleElement = document.getElementById("edit-Titel")
+const editStartElement = document.getElementById("edit-Start")
+const editEndElement = document.getElementById("edit-Ende")
+const editDescriptionElement = document.getElementById("edit-Beschreibung")
+const editLocationElement = document.getElementById("edit-Ort")
+const editUUIDElement = document.querySelector("[data-edit-uuid]")
+const editFormElement = document.querySelector("[data-form-edit]")
+
+let eventObject;
+
 const getSelectContactContainer = async () => {
     const resp = await axiosInstance.get('/contacts')
 
@@ -97,6 +107,9 @@ const getCalenderElement = (event, me) => {
 
     if (me.email === event.creator_email && me.username === event.creator_username) {
 
+        const container = document.createElement('div')
+        container.className = 'm-2'
+
         const inviteButton = document.createElement("button")
         inviteButton.textContent = '+'
         inviteButton.className = 'btn btn-primary'
@@ -122,7 +135,7 @@ const getCalenderElement = (event, me) => {
                 try {
                     const resp = await axiosInstance.post(`/events/${event.uuid}/entries`, {contact_uuid})
                     const newParticipantElement = getCalenderParticipantElement(me, event, resp.data)
-                    calenderElement.insertBefore(newParticipantElement, inviteButton)
+                    calenderElement.insertBefore(newParticipantElement, container)
                     closeErrorAlertIfThere()
                 } catch (e) {
                     openErrorAlert(e.response.data.detail, e)
@@ -130,10 +143,26 @@ const getCalenderElement = (event, me) => {
                 formElement.remove()
             })
 
-            calenderElement.insertBefore(formElement, inviteButton)
+            calenderElement.insertBefore(formElement, container)
         })
+        container.appendChild(inviteButton)
+        calenderElement.appendChild(container)
 
-        calenderElement.appendChild(inviteButton)
+        const editBtn = document.createElement("button")
+        editBtn.className = "btn btn-warning mr-sm-2"
+        editBtn.innerText = "Termin verändern"
+        editBtn.setAttribute("data-toggle", "modal")
+        editBtn.setAttribute("data-target", "#editModal")
+        editBtn.addEventListener('click', () => {
+            editTitleElement.value = event.title
+            editStartElement.value = event.start_date.replace('+00:00','')
+            editEndElement.value = event.end_date.replace('+00:00','')
+            editDescriptionElement.value = event.description
+            editLocationElement.value = event.location
+            editUUIDElement.value = event.uuid
+            eventObject = calenderElement
+        })
+        calenderElement.appendChild(editBtn)
     }
 
     const btn = document.createElement("button")
@@ -262,6 +291,32 @@ const init = async () => {
             locationElement.value = ''
             $('#createModal').modal('hide');
             closeErrorAlertIfThere()
+        } catch (e) {
+            openErrorAlert(e.response.data.detail, e)
+        }
+    })
+
+    editFormElement.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const uuid = editUUIDElement.value
+        const title = editTitleElement.value
+        const start_date = editStartElement.value
+        const end_date = editEndElement.value
+        const description = editDescriptionElement.value
+        const location = editLocationElement.value
+
+        try {
+            const resp = await axiosInstance.put(`/events/${uuid}`, {title, start_date, end_date, description, location})
+            const newEventElement = getCalenderElement(resp.data, me)
+            closeErrorAlertIfThere()
+            $('#editModal').modal('hide');
+            editUUIDElement.value = ''
+            editTitleElement.value = ''
+            editStartElement.value = ''
+            editEndElement.value = ''
+            editDescriptionElement.value = ''
+            editLocationElement.value = ''
+            eventObject.parentNode.replaceChild(newEventElement, eventObject)
         } catch (e) {
             openErrorAlert(e.response.data.detail, e)
         }
