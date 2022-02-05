@@ -60,8 +60,6 @@ const changePassword = async (e) => {
 }
 
 const deleteUser = async () => {
-    // TODO: vielleicht noch eine messagebox aufpoppen lassen
-    // ob man sich wirklich sicher ist
     const currentUser = await user.getMe()
     try {
         await axiosInstance.delete("/users/" + currentUser.username)

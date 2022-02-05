@@ -22,13 +22,13 @@ const getCalenderElement = (event, me) => {
     calenderElement.classList.add('calenderCSS')
 
     const startDate = JSON.stringify(event.start_date)
-    const spilttetStart = startDate.split("T")
-    const start = spilttetStart[0].split("-")
+    const splittetStart = startDate.split("T")
+    const start = splittetStart[0].split("-")
     const startYear = start[0].substring(1)
     const startMonth = start[1]
     const startDay = start[2]
-    const startHour = spilttetStart[1].split(":")[0]
-    const startMinute = spilttetStart[1].split(":")[1]
+    const startHour = splittetStart[1].split(":")[0]
+    const startMinute = splittetStart[1].split(":")[1]
 
     const endDate = JSON.stringify(event.end_date)
     const splittetEnd = endDate.split("T")
@@ -130,7 +130,7 @@ participantsButton.addEventListener("click", async () => {
 })
 
 //Holt sich alle Einladungen zu Events und zeigt diese im Einladungenfenster an
-const getInvites = async () => {
+const getInvites = async (me) => {
     const response = await axiosInstance.get("/invitations?status_id=2")
     invitesContent.innerHTML = ""
     if (response.data.length !== 0)
@@ -148,7 +148,7 @@ const getInvites = async () => {
 
         invitesContent.appendChild(inviteElement)
 
-        let btnAbsage = document.createElement("button")
+        const btnAbsage = document.createElement("button")
         btnAbsage.className = "btn btn-danger mr-sm-2"
         btnAbsage.innerText = "Termin absagen"
         btnAbsage.addEventListener("click", async () => {
@@ -157,7 +157,7 @@ const getInvites = async () => {
         })
         inviteElement.appendChild(btnAbsage)
 
-        let btnZusage = document.createElement("button")
+        const btnZusage = document.createElement("button")
         btnZusage.className = "btn btn-success mr-sm-2"
         btnZusage.innerText = "Termin zusagen"
 
@@ -174,7 +174,7 @@ const init = async () => {
 
     const me = await user.getMe()
 
-    await getInvites()
+    await getInvites(me)
 
     formElement.addEventListener("submit", async (e) => {
         e.preventDefault()
