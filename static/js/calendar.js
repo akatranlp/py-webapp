@@ -28,6 +28,7 @@ const getSelectContactContainer = async () => {
     const resp = await axiosInstance.get('/contacts')
 
     const selectElement = document.createElement('select')
+    selectElement.className = "m-1"
     resp.data.forEach(contact => {
         const optionElement = document.createElement('option')
         optionElement.textContent = `${contact.firstname} ${contact.name}`
@@ -125,14 +126,14 @@ const getCalenderElement = (event, me) => {
 
             const btn = document.createElement("input");
             btn.type = 'submit'
-            btn.className = 'btn btn-success'
+            btn.className = 'btn btn-success m-1'
             btn.value = 'Einladen'
 
             formElement.appendChild(btn)
 
             const cancelBtnElement = document.createElement('button')
             cancelBtnElement.textContent = '×'
-            cancelBtnElement.className = 'btn btn-danger text-white mr-sm-2'
+            cancelBtnElement.className = 'btn btn-danger text-white mr-sm-2 m-1'
             formElement.appendChild(cancelBtnElement)
 
             cancelBtnElement.addEventListener('click', () => {
@@ -249,6 +250,7 @@ const getInvites = async (me) => {
         btnAbsage.addEventListener("click", async () => {
             await axiosInstance.put(`/invitations/${uuid}`, {status_id: 3})
             inviteElement.remove()
+            changeInviteBadge()
         })
         inviteElement.appendChild(btnAbsage)
 
@@ -259,10 +261,21 @@ const getInvites = async (me) => {
         btnZusage.addEventListener("click", async () => {
             await axiosInstance.put(`/invitations/${uuid}`, {status_id: 1})
             inviteElement.remove()
+            changeInviteBadge()
             await createCalender(me)
         })
         inviteElement.appendChild(btnZusage)
     })
+}
+const changeInviteBadge = () => {
+    let invites = parseInt(inviteCount.textContent)
+    invites --
+    if (invites !== 0){
+        inviteCount.textContent = invites
+    }else{
+        inviteCount.remove()
+    }
+
 }
 
 const init = async () => {

@@ -60,15 +60,18 @@ const getContactElement = (contact) => {
     const row = document.createElement("tr")
     const contactName = document.createElement("td")
     contactName.innerHTML = contact.name
+    contactName.className = "text-wrap text-break"
     const contactFirstname = document.createElement("td")
     contactFirstname.innerHTML = contact.firstname
+    contactFirstname.className = "text-wrap text-break"
     const contactEmail = document.createElement("td")
     contactEmail.innerHTML = contact.email
     contactEmail.className = "text-wrap text-break"
-
+    const settings = document.createElement("td")
+    settings.className="p-0"
     const changeButton = document.createElement("button")
     changeButton.innerHTML = "Nutzer bearbeiten"
-    changeButton.className = "btn btn-warning mr-sm-2"
+    changeButton.className = "btn btn-warning m-1"
     changeButton.setAttribute("data-toggle", "modal")
     changeButton.setAttribute("data-target", "#editModal")
     changeButton.addEventListener("click", async (event) => {
@@ -81,7 +84,7 @@ const getContactElement = (contact) => {
 
     const deleteButton = document.createElement("button")
     deleteButton.innerHTML = "Nutzer entfernen"
-    deleteButton.className = "btn btn-danger mr-sm-2"
+    deleteButton.className = "btn btn-danger m-1"
     deleteButton.addEventListener("click", async (event) => {
         try {
             await axiosInstance.delete("/contacts/" + contact.uuid)
@@ -93,8 +96,9 @@ const getContactElement = (contact) => {
     row.appendChild(contactName)
     row.appendChild(contactFirstname)
     row.appendChild(contactEmail)
-    row.appendChild(changeButton)
-    row.appendChild(deleteButton)
+    row.appendChild(settings)
+    settings.appendChild(changeButton)
+    settings.appendChild(deleteButton)
     return row
 }
 
