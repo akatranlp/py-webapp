@@ -5,7 +5,6 @@ const participantsDiv = document.getElementById("participantsContent")
 const participantsButton = document.getElementById("addParticipant")
 const formElement = document.querySelector("[data-form]")
 const invitesContent = document.getElementById("invitesContent")
-const invitesButton = document.getElementById("createEinladung")
 const titleElement = document.getElementById("Titel")
 const startElement = document.getElementById("Start")
 const endElement = document.getElementById("Ende")
@@ -15,6 +14,48 @@ const inviteCount = document.querySelector("[data-invite-count]")
 
 const errorAlert = document.querySelector("[data-alert]");
 
+const getSelectContactContainer = async () => {
+    const resp = await axiosInstance.get('/contacts')
+
+    const selectElement = document.createElement('select')
+    resp.data.forEach(contact => {
+        const optionElement = document.createElement('option')
+        optionElement.innerText = `${contact.firstname} ${contact.name}`
+        optionElement.value = contact.uuid
+        selectElement.appendChild(optionElement)
+    })
+    return selectElement
+}
+
+const getCalenderParticipantElement = (me, event, participant) => {
+    const userDiv = document.createElement("div")
+
+    if (participant.status === "Pending") {
+        userDiv.className = "alert-warning p-2 d-flex"
+    } else if (participant.status === "Accepted") {
+        userDiv.className = "alert-success p-2 d-flex"
+    } else if (participant.status === "Declined") {
+        userDiv.className = "alert-danger p-2 d-flex"
+    }
+    userDiv.innerHTML = `<div class="m-2">${participant.contact_firstname}, ${participant.contact_name}</div>`
+
+    if (me.email === event.creator_email && me.username === event.creator_username) {
+        const btn = document.createElement("button")
+        btn.className = "btn btn-danger "
+        btn.innerText = "Person ausladen"
+        btn.addEventListener("click", async () => {
+            try {
+                await axiosInstance.delete(`/events/${event.uuid}/entries/${participant.contact_uuid}`)
+                closeErrorAlertIfThere()
+                userDiv.remove()
+            } catch (e) {
+                openErrorAlert(e.response.data.detail, e)
+            }
+        })
+        userDiv.appendChild(btn)
+    }
+    return userDiv
+}
 
 const getCalenderElement = (event, me) => {
     const calenderElement = document.createElement('div');
@@ -51,34 +92,49 @@ const getCalenderElement = (event, me) => {
             </p>
             `
     event.participants.forEach((participant) => {
-        const userDiv = document.createElement("div")
+        calenderElement.appendChild(getCalenderParticipantElement(me, event, participant))
+    })
 
-        if (participant.status === "Pending") {
-            userDiv.className = "alert-warning p-2 d-flex"
-        } else if (participant.status === "Accepted") {
-            userDiv.className = "alert-success p-2 d-flex"
-        } else if (participant.status === "Declined") {
-            userDiv.className = "alert-danger p-2 d-flex"
-        }
-        userDiv.innerHTML = `<div class="m-2">${participant.contact_firstname}, ${participant.contact_name}</div>`
+    if (me.email === event.creator_email && me.username === event.creator_username) {
 
-        if (me.email === event.creator_email && me.username === event.creator_username) {
-            const btn = document.createElement("button")
-            btn.className = "btn btn-danger "
-            btn.innerText = "Person ausladen"
-            btn.addEventListener("click", async () => {
+        const inviteButton = document.createElement("button")
+        inviteButton.textContent = '+'
+        inviteButton.className = 'btn btn-primary'
+
+        inviteButton.addEventListener('click', async () => {
+            const formElement = document.createElement("form")
+            formElement.action = ''
+            formElement.method = 'post'
+
+            const selectContainer = await getSelectContactContainer()
+            formElement.appendChild(selectContainer)
+
+            const btn = document.createElement("input");
+            btn.type = 'submit'
+            btn.className = 'btn btn-success'
+            btn.value = 'Einladen'
+
+            formElement.appendChild(btn)
+
+            formElement.addEventListener('submit', async (e) => {
+                e.preventDefault()
+                const contact_uuid = selectContainer.value
                 try {
-                    await axiosInstance.delete(`/events/${event.uuid}/entries/${participant.contact_uuid}`)
+                    const resp = await axiosInstance.post(`/events/${event.uuid}/entries`, {contact_uuid})
+                    const newParticipantElement = getCalenderParticipantElement(me, event, resp.data)
+                    calenderElement.insertBefore(newParticipantElement, inviteButton)
                     closeErrorAlertIfThere()
-                    userDiv.remove()
                 } catch (e) {
                     openErrorAlert(e.response.data.detail, e)
                 }
+                formElement.remove()
             })
-            userDiv.appendChild(btn)
-        }
-        calenderElement.appendChild(userDiv)
-    })
+
+            calenderElement.insertBefore(formElement, inviteButton)
+        })
+
+        calenderElement.appendChild(inviteButton)
+    }
 
     const btn = document.createElement("button")
     btn.className = "btn btn-danger mr-sm-2"
