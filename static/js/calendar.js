@@ -41,11 +41,11 @@ const getCalenderParticipantElement = (me, event, participant) => {
     const userDiv = document.createElement("div")
 
     if (participant.status === "Pending") {
-        userDiv.className = "alert-warning p-2 d-flex"
+        userDiv.className = "alert-warning p-2 mb-2 d-flex"
     } else if (participant.status === "Accepted") {
-        userDiv.className = "alert-success p-2 d-flex"
+        userDiv.className = "alert-success p-2 mb-2 d-flex"
     } else if (participant.status === "Declined") {
-        userDiv.className = "alert-danger p-2 d-flex"
+        userDiv.className = "alert-danger p-2 mb-2 d-flex"
     }
     userDiv.innerHTML = `<div class="m-2">${participant.contact_firstname}, ${participant.contact_name}</div>`
 
@@ -118,6 +118,7 @@ const getCalenderElement = (event, me) => {
             const formElement = document.createElement("form")
             formElement.action = ''
             formElement.method = 'post'
+            formElement.className = 'mb-2'
 
             const selectContainer = await getSelectContactContainer()
             formElement.appendChild(selectContainer)
@@ -128,6 +129,15 @@ const getCalenderElement = (event, me) => {
             btn.value = 'Einladen'
 
             formElement.appendChild(btn)
+
+            const cancelBtnElement = document.createElement('button')
+            cancelBtnElement.innerText = '×'
+            cancelBtnElement.className = 'btn btn-danger text-white mr-sm-2'
+            formElement.appendChild(cancelBtnElement)
+
+            cancelBtnElement.addEventListener('click', () => {
+                formElement.remove()
+            })
 
             formElement.addEventListener('submit', async (e) => {
                 e.preventDefault()
@@ -155,8 +165,8 @@ const getCalenderElement = (event, me) => {
         editBtn.setAttribute("data-target", "#editModal")
         editBtn.addEventListener('click', () => {
             editTitleElement.value = event.title
-            editStartElement.value = event.start_date.replace('+00:00','')
-            editEndElement.value = event.end_date.replace('+00:00','')
+            editStartElement.value = event.start_date.replace('+00:00', '')
+            editEndElement.value = event.end_date.replace('+00:00', '')
             editDescriptionElement.value = event.description
             editLocationElement.value = event.location
             editUUIDElement.value = event.uuid
@@ -306,7 +316,13 @@ const init = async () => {
         const location = editLocationElement.value
 
         try {
-            const resp = await axiosInstance.put(`/events/${uuid}`, {title, start_date, end_date, description, location})
+            const resp = await axiosInstance.put(`/events/${uuid}`, {
+                title,
+                start_date,
+                end_date,
+                description,
+                location
+            })
             const newEventElement = getCalenderElement(resp.data, me)
             closeErrorAlertIfThere()
             $('#editModal').modal('hide');
