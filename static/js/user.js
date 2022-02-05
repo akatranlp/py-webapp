@@ -7,13 +7,13 @@ const getUserElement = (user) => {
     const userRow = document.createElement('tr');
     {
         const nameElement = document.createElement('td');
-        nameElement.innerText = user.username
+        nameElement.textContent = user.username
         nameElement.className = "align-middle"
         userRow.appendChild(nameElement)
     }
     {
         const emailElement = document.createElement('td');
-        emailElement.innerText = user.email
+        emailElement.textContent = user.email
         emailElement.className = "align-middle"
         userRow.appendChild(emailElement)
     }
@@ -24,7 +24,7 @@ const getUserElement = (user) => {
 
     const isAdminBtn = document.createElement('button');
     isAdminBtn.className = `btn text-white mr-sm-2 ${user.is_admin ? "btn-danger" : "btn-success"}`
-    isAdminBtn.innerText = user.is_admin ? 'Adminrechte entfernen' : 'Adminrechte geben'
+    isAdminBtn.textContent = user.is_admin ? 'Adminrechte entfernen' : 'Adminrechte geben'
     buttonElement.appendChild(isAdminBtn);
 
     isAdminBtn.addEventListener('click', async () => {
@@ -44,7 +44,7 @@ const getUserElement = (user) => {
 
     const isActiveBtn = document.createElement('button');
     isActiveBtn.className = `btn text-white mr-sm-2 ${user.is_active ? "btn-danger" : "btn-success"}`
-    isActiveBtn.innerText = user.is_active ? 'Deaktivieren' : 'Reaktivieren'
+    isActiveBtn.textContent = user.is_active ? 'Deaktivieren' : 'Reaktivieren'
     buttonElement.appendChild(isActiveBtn);
 
     isActiveBtn.addEventListener('click', async () => {
@@ -64,13 +64,13 @@ const getUserElement = (user) => {
 
     const deleteBtnPre = document.createElement('button');
     deleteBtnPre.className = 'btn text-white mr-sm-2 btn-danger'
-    deleteBtnPre.innerText = 'Löschen'
+    deleteBtnPre.textContent = 'Löschen'
     buttonElement.appendChild(deleteBtnPre);
     deleteBtnPre.addEventListener('click', async () => {
         //Beim klicken wird der Nachfrageknopf erstellt und deleteBtnPre gelöscht
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn text-white mr-sm-2 btn-dark'
-        deleteBtn.innerText = 'Sicher?'
+        deleteBtn.textContent = 'Sicher?'
         buttonElement.appendChild(deleteBtn);
 
         deleteBtn.addEventListener('click', async () => {
@@ -107,9 +107,9 @@ const init = async () => {
 const openErrorAlert = (text, e) => {
     errorAlert.className = "alert alert-danger p-1"
     if (e !== null) {
-        errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
+        errorAlert.textContent = text + ": " + e.response.status + " - " + e.response.statusText
     } else {
-        errorAlert.innerText = text
+        errorAlert.textContent = text
     }
     errorAlert.removeAttribute("hidden")
 }

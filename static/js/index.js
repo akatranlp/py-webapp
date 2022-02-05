@@ -30,13 +30,13 @@ const renderLoggedIn = (me) => {
         const linkContainer = document.querySelector("[data-link-container]")
         const usersLink = document.createElement("a")
         usersLink.className = "btn btn-primary text-white mr-sm-2"
-        usersLink.innerText = "Users"
+        usersLink.textContent = "Users"
         usersLink.href = "/user"
 
         linkContainer.insertBefore(usersLink, linkContainer.querySelector(":first-child"))
     }
     const meElement = document.querySelector("[data-me]");
-    meElement.innerText = me.username
+    meElement.textContent = me.username
 }
 
 const renderLoggedOut = () => {
@@ -49,7 +49,7 @@ const renderPlugins = async () => {
     const plugins = resp.data
     if (plugins.length > 0) {
         const pluginsHeader = document.createElement('h2');
-        pluginsHeader.innerText = 'Folgende Plugins sind installiert'
+        pluginsHeader.textContent = 'Folgende Plugins sind installiert'
         pluginsContainerElement.appendChild(pluginsHeader);
     }
 

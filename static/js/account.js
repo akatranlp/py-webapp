@@ -14,7 +14,7 @@ const init = () => {
     deleteButton.addEventListener("click", async () => {
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn text-white mr-sm-2 btn-dark'
-        deleteBtn.innerText = 'Sicher?'
+        deleteBtn.textContent = 'Sicher?'
         deleteButton.parentNode.appendChild(deleteBtn);
 
         deleteBtn.addEventListener('click', async () => {
@@ -29,7 +29,7 @@ const changePassword = async (e) => {
     e.preventDefault()
     if (newPassword.value !== newPassword2.value) {
         passwordAlert.className = "alert alert-danger p-1"
-        passwordAlert.innerText = "'Neues Passwort'-Eingaben stimmen nicht überein"
+        passwordAlert.textContent = "'Neues Passwort'-Eingaben stimmen nicht überein"
     } else {
         try {
             await axiosInstance.put("/change_password", {
@@ -37,7 +37,7 @@ const changePassword = async (e) => {
                 new_password: newPassword.value
             })
             passwordAlert.className = "alert alert-success p-1"
-            passwordAlert.innerText = "Passwort erfolgreich geändert"
+            passwordAlert.textContent = "Passwort erfolgreich geändert"
             oldPassword.value = ''
             newPassword.value = ''
             newPassword2.value = ''
@@ -47,12 +47,12 @@ const changePassword = async (e) => {
             switch (e.response.status) {
                 case 401:
                     if (e.response.data.detail === "False old password")
-                        passwordAlert.innerText = "Fehler: Das eingegebene alte Passwort ist falsch"
+                        passwordAlert.textContent = "Fehler: Das eingegebene alte Passwort ist falsch"
                     else
-                        passwordAlert.innerText = "Fehler: Du hast keine Rechte das Passwort zu ändern"
+                        passwordAlert.textContent = "Fehler: Du hast keine Rechte das Passwort zu ändern"
                     break;
                 default:
-                    passwordAlert.innerText = "Es ist ein unerwarteter Fehler aufgetreten: " + e.response.status + " - " + e.response.statusText
+                    passwordAlert.textContent = "Es ist ein unerwarteter Fehler aufgetreten: " + e.response.status + " - " + e.response.statusText
             }
         }
     }
@@ -66,7 +66,7 @@ const deleteUser = async () => {
         window.location.replace("/login")
     } catch (e) {
         deleteUserAlert.className = "alert alert-danger p-1"
-        deleteUserAlert.innerText = "Fehler beim Löschen des Accounts: " + e.response.status + " - " + e.response.statusText
+        deleteUserAlert.textContent = "Fehler beim Löschen des Accounts: " + e.response.status + " - " + e.response.statusText
         deleteUserAlert.removeAttribute("hidden")
     }
 

@@ -93,12 +93,12 @@ const loadTodo = (curTodo) => {
     todoObject.className = "p-2 border border-info rounded highlight mb-1"
     // Titel -----------------------------------------------------------------------------------------------------------
     let title = document.createElement('h2')
-    title.innerText = curTodo.title;
+    title.textContent = curTodo.title;
     title.className = "text-wrap text-break"
     todoObject.appendChild(title)
     // Beschreibung ----------------------------------------------------------------------------------------------------
     let description = document.createElement('p')
-    description.innerText = curTodo.description;
+    description.textContent = curTodo.description;
     description.className = "text-wrap text-break"
     todoObject.appendChild(description)
     //Div für die Knopfe -----------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ const loadTodo = (curTodo) => {
         deleteTodo(curTodo.uuid)
         buttonDelete.parentElement.parentElement.remove() //Löscht das TodoObjekt
     })
-    buttonDelete.innerText = "Löschen"
+    buttonDelete.textContent = "Löschen"
     buttonDiv.appendChild(buttonDelete)
     //Div für Bearbeiten/Statusändern ----------------------------------------------------------------------------------
     let divEditButtons = document.createElement('div')
@@ -123,8 +123,8 @@ const loadTodo = (curTodo) => {
     buttonEdit.setAttribute("data-toggle", "modal")
     buttonEdit.setAttribute("data-target", "#editModal")
     buttonEdit.addEventListener("click", () => {
-        editTitle.value = title.innerText
-        editDescription.value = description.innerText
+        editTitle.value = title.textContent
+        editDescription.value = description.textContent
         editUUID.value = curTodo.uuid
         toEditObject = todoObject
     })
@@ -138,10 +138,10 @@ const loadTodo = (curTodo) => {
     })
     if (curTodo.status) {
         buttonChangeStatus.className = "btn btn-warning ml-2"
-        buttonChangeStatus.innerText = "Reaktivieren"
+        buttonChangeStatus.textContent = "Reaktivieren"
     } else {
         buttonChangeStatus.className = "btn btn-success ml-2 text-white"
-        buttonChangeStatus.innerText = "Erledigt"
+        buttonChangeStatus.textContent = "Erledigt"
     }
     divEditButtons.appendChild(buttonChangeStatus)
 
@@ -149,7 +149,7 @@ const loadTodo = (curTodo) => {
 
 const openErrorAlert = (text, e) => {
     errorAlert.className = "alert alert-danger p-1"
-    errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
+    errorAlert.textContent = text + ": " + e.response.status + " - " + e.response.statusText
     errorAlert.removeAttribute("hidden")
 }
 

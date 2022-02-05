@@ -30,7 +30,7 @@ const getSelectContactContainer = async () => {
     const selectElement = document.createElement('select')
     resp.data.forEach(contact => {
         const optionElement = document.createElement('option')
-        optionElement.innerText = `${contact.firstname} ${contact.name}`
+        optionElement.textContent = `${contact.firstname} ${contact.name}`
         optionElement.value = contact.uuid
         selectElement.appendChild(optionElement)
     })
@@ -52,7 +52,7 @@ const getCalenderParticipantElement = (me, event, participant) => {
     if (me.email === event.creator_email && me.username === event.creator_username) {
         const btn = document.createElement("button")
         btn.className = "btn btn-danger "
-        btn.innerText = "Person ausladen"
+        btn.textContent = "Person ausladen"
         btn.addEventListener("click", async () => {
             try {
                 await axiosInstance.delete(`/events/${event.uuid}/entries/${participant.contact_uuid}`)
@@ -131,7 +131,7 @@ const getCalenderElement = (event, me) => {
             formElement.appendChild(btn)
 
             const cancelBtnElement = document.createElement('button')
-            cancelBtnElement.innerText = '×'
+            cancelBtnElement.textContent = '×'
             cancelBtnElement.className = 'btn btn-danger text-white mr-sm-2'
             formElement.appendChild(cancelBtnElement)
 
@@ -160,7 +160,7 @@ const getCalenderElement = (event, me) => {
 
         const editBtn = document.createElement("button")
         editBtn.className = "btn btn-warning mr-sm-2"
-        editBtn.innerText = "Termin verändern"
+        editBtn.textContent = "Termin verändern"
         editBtn.setAttribute("data-toggle", "modal")
         editBtn.setAttribute("data-target", "#editModal")
         editBtn.addEventListener('click', () => {
@@ -177,7 +177,7 @@ const getCalenderElement = (event, me) => {
 
     const btn = document.createElement("button")
     btn.className = "btn btn-danger mr-sm-2"
-    btn.innerText = "Termin absagen"
+    btn.textContent = "Termin absagen"
     btn.addEventListener("click", async () => {
         try {
             if (me.email === event.creator_email && me.username === event.creator_username) {
@@ -229,7 +229,7 @@ const getInvites = async (me) => {
     const response = await axiosInstance.get("/invitations?status_id=2")
     invitesContent.innerHTML = ""
     if (response.data.length !== 0)
-        inviteCount.innerText = response.data.length
+        inviteCount.textContent = response.data.length
     response.data.forEach(event => {
         const inviterName = event.creator_username
         const eventTitel = event.title
@@ -245,7 +245,7 @@ const getInvites = async (me) => {
 
         const btnAbsage = document.createElement("button")
         btnAbsage.className = "btn btn-danger mr-sm-2"
-        btnAbsage.innerText = "Termin absagen"
+        btnAbsage.textContent = "Termin absagen"
         btnAbsage.addEventListener("click", async () => {
             await axiosInstance.put(`/invitations/${uuid}`, {status_id: 3})
             inviteElement.remove()
@@ -254,7 +254,7 @@ const getInvites = async (me) => {
 
         const btnZusage = document.createElement("button")
         btnZusage.className = "btn btn-success mr-sm-2"
-        btnZusage.innerText = "Termin zusagen"
+        btnZusage.textContent = "Termin zusagen"
 
         btnZusage.addEventListener("click", async () => {
             await axiosInstance.put(`/invitations/${uuid}`, {status_id: 1})
@@ -344,9 +344,9 @@ const init = async () => {
 const openErrorAlert = (text, e) => {
     errorAlert.className = "alert alert-danger p-1"
     if (e !== null) {
-        errorAlert.innerText = text + ": " + e.response.status + " - " + e.response.statusText
+        errorAlert.textContent = text + ": " + e.response.status + " - " + e.response.statusText
     } else {
-        errorAlert.innerText = text
+        errorAlert.textContent = text
     }
     errorAlert.removeAttribute("hidden")
 }
