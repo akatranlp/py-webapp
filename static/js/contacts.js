@@ -68,7 +68,7 @@ const getContactElement = (contact) => {
 
     const changeButton = document.createElement("button")
     changeButton.innerHTML = "Nutzer bearbeiten"
-    changeButton.className = "btn btn-success mr-sm-2"
+    changeButton.className = "btn btn-warning mr-sm-2"
     changeButton.setAttribute("data-toggle", "modal")
     changeButton.setAttribute("data-target", "#editModal")
     changeButton.addEventListener("click", async (event) => {
