@@ -11,6 +11,7 @@ const startElement = document.getElementById("Start")
 const endElement = document.getElementById("Ende")
 const descriptionElement = document.getElementById("Beschreibung")
 const locationElement = document.getElementById("Ort")
+const inviteCount = document.querySelector("[data-invite-count]")
 
 const errorAlert = document.querySelector("[data-alert]");
 
@@ -128,49 +129,52 @@ participantsButton.addEventListener("click", async () => {
     })
 })
 
+//Holt sich alle Einladungen zu Events und zeigt diese im Einladungenfenster an
+const getInvites = async () => {
+    const response = await axiosInstance.get("/invitations?status_id=2")
+    invitesContent.innerHTML = ""
+    if (response.data.length !== 0)
+        inviteCount.innerText = response.data.length
+    response.data.forEach(event => {
+        const inviterName = event.creator_username
+        const eventTitel = event.title
+        const uuid = event.uuid
+        const inviteElement = document.createElement("div")
+
+        inviteElement.innerHTML = ` 
+            <p>Eingeladen von: ${inviterName} <br>
+             Zum Event: ${eventTitel}</p>
+            `
+
+        invitesContent.appendChild(inviteElement)
+
+        let btnAbsage = document.createElement("button")
+        btnAbsage.className = "btn btn-danger mr-sm-2"
+        btnAbsage.innerText = "Termin absagen"
+        btnAbsage.addEventListener("click", async () => {
+            await axiosInstance.put(`/invitations/${uuid}`, {status_id: 3})
+            inviteElement.remove()
+        })
+        inviteElement.appendChild(btnAbsage)
+
+        let btnZusage = document.createElement("button")
+        btnZusage.className = "btn btn-success mr-sm-2"
+        btnZusage.innerText = "Termin zusagen"
+
+        btnZusage.addEventListener("click", async () => {
+            await axiosInstance.put(`/invitations/${uuid}`, {status_id: 1})
+            inviteElement.remove()
+            await createCalender(me)
+        })
+        inviteElement.appendChild(btnZusage)
+    })
+}
+
 const init = async () => {
 
     const me = await user.getMe()
 
-    invitesButton.addEventListener("click", async () => {
-        const response = await axiosInstance.get("/invitations?status_id=2")
-        invitesContent.innerHTML = ""
-
-        response.data.forEach(event => {
-            const inviterName = event.creator_username
-            const eventTitel = event.title
-            const uuid = event.uuid
-            const inviteElement = document.createElement("div")
-
-            inviteElement.innerHTML = ` 
-            <p>Eingeladen von: ${inviterName} <br>
-             zum event: ${eventTitel}</p>
-            `
-
-            invitesContent.appendChild(inviteElement)
-
-            let btnAbsage = document.createElement("button")
-            btnAbsage.className = "btn btn-danger mr-sm-2"
-            btnAbsage.innerText = "Termin absagen"
-            btnAbsage.addEventListener("click", async () => {
-                await axiosInstance.put(`/invitations/${uuid}`, {status_id: 3})
-                inviteElement.remove()
-            })
-            inviteElement.appendChild(btnAbsage)
-
-            let btnZusage = document.createElement("button")
-            btnZusage.className = "btn btn-success mr-sm-2"
-            btnZusage.innerText = "Termin zusagen"
-
-            btnZusage.addEventListener("click", async () => {
-                await axiosInstance.put(`/invitations/${uuid}`, {status_id: 1})
-                inviteElement.remove()
-                await createCalender(me)
-            })
-            inviteElement.appendChild(btnZusage)
-        })
-    })
-
+    await getInvites()
 
     formElement.addEventListener("submit", async (e) => {
         e.preventDefault()
