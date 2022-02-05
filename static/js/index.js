@@ -30,7 +30,7 @@ const renderLoggedIn = (me) => {
         const linkContainer = document.querySelector("[data-link-container]")
         const usersLink = document.createElement("a")
         usersLink.className = "btn btn-primary text-white mr-sm-2"
-        usersLink.textContent = "Users"
+        usersLink.textContent = "Benutzer"
         usersLink.href = "/user"
 
         linkContainer.insertBefore(usersLink, linkContainer.querySelector(":first-child"))
